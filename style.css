@@ -302,6 +302,10 @@ nav#mainNav.scrolled .nav-links a { color: var(--ink); }
   cursor: pointer;
   display: flex;
   align-items: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  outline: none;
 }
 .slide-zone.zone-prev { left: 0;  justify-content: flex-start; padding-left: 40px; }
 .slide-zone.zone-next { right: 0; justify-content: flex-end;   padding-right: 40px; }
