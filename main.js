@@ -85,14 +85,6 @@ document.getElementById('slidePrev').addEventListener('click', () => {
   const words  = ['Creative', 'AI', 'Design', 'Social', 'Content', 'Photography'];
   const colors = ['#1a4aff', '#e8251a', '#1a1020', '#e8251a', '#1a4aff', '#1a1020'];
 
-  const probe = document.createElement('span');
-  probe.style.cssText = [
-    'position:absolute', 'visibility:hidden', 'white-space:nowrap',
-    'font-family:PPEditorial,serif', 'font-size:12px', 'font-weight:500',
-    'letter-spacing:.12em', 'text-transform:uppercase',
-  ].join(';');
-  document.body.appendChild(probe);
-
   function spawnBubble() {
     const el    = document.createElement('div');
     el.className = 'hero-bubble';
@@ -100,11 +92,7 @@ document.getElementById('slidePrev').addEventListener('click', () => {
     const col  = colors[Math.floor(Math.random() * colors.length)];
     const word = words[Math.floor(Math.random() * words.length)];
 
-    probe.textContent = word;
-    const textW = probe.offsetWidth;
-    const textH = probe.offsetHeight;
-    const minS  = Math.ceil(Math.sqrt(textW * textW + textH * textH)) + 10;
-    const s     = minS + Math.floor(Math.random() * 30);
+    const s = 85;
 
     const startX     = 4 + Math.random() * 88;
     const startY     = hero.offsetHeight * (0.2 + Math.random() * 0.7);
@@ -168,7 +156,6 @@ document.getElementById('slidePrev').addEventListener('click', () => {
     }
   });
 
-  probe.remove();
 })();
 
 /* ── Mobile menu ─────────────────────────────────────────────────────────── */
