@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About — Brushgunz — Chen Mizrach</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="mainNav" class="nav-light" role="navigation" aria-label="Main">
+  <ul class="nav-links">
+    <li><a href="index.html">Brushgunz</a></li>
+    <li><a href="about.html" class="active">About</a></li>
+    <li><a href="index.html#work">Work</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- MOBILE HAMBURGER -->
+<button class="mob-menu-btn" id="mobMenuBtn" aria-label="Open menu" aria-expanded="false">
+  <span></span><span></span><span></span>
+</button>
+
+<!-- MOBILE OVERLAY -->
+<div class="mob-overlay" id="mobOverlay" role="dialog" aria-modal="true" aria-label="Navigation">
+  <a href="index.html">Brushgunz</a>
+  <a href="about.html">About</a>
+  <a href="index.html#work">Work</a>
+  <a href="contact.html">Contact</a>
+  <button class="mob-close" id="mobClose" aria-label="Close menu">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <line x1="4" y1="4" x2="20" y2="20"/>
+      <line x1="20" y1="4" x2="4" y2="20"/>
+    </svg>
+  </button>
+</div>
+
+<div class="page">
+
+  <!-- ABOUT HEADER -->
+  <div class="about-header">
+    <h1 class="about-title" id="aboutTitle">Brushgunz</h1>
+    <div class="about-bubble" aria-hidden="true"><span>About</span></div>
+    <div class="title-spacer"></div>
+  </div>
+
+  <!-- 2×2 PHOTO GRID -->
+  <div class="photo-grid" aria-hidden="true">
+    <div class="photo-cell c1"></div>
+    <div class="photo-cell c2"></div>
+    <div class="photo-cell c3"></div>
+    <div class="photo-cell c4"></div>
+  </div>
+
+  <!-- BIO -->
+  <section class="bio-section">
+    <p class="bio-black">Brushgunz is Chen Mizrach who is a Creative Director &amp; photographer.</p>
+    <p class="bio-blue">I create vision and clarity for brands. Help them create the content they didn't know they need. All with a playful and creative attitude.</p>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-hey">Hey.</div>
+      <div class="footer-pic" role="img" aria-label="Chen Mizrach photo"></div>
+      <p class="footer-desc">If this website got you interested in something and you work on some kind of a lifestyle product, don't hesitate to call or contact.</p>
+    </div>
+    <hr class="footer-divider">
+    <div class="footer-links">
+      <a href="mailto:chen@brushgunz.com">chen@brushgunz.com</a>
+      <a href="https://instagram.com/brushgunz" target="_blank" rel="noopener noreferrer">@brushgunz</a>
+    </div>
+    <div class="footer-bar">
+      <span>© 2025 Brushgunz — Chen Mizrach</span>
+      <span>Creative Direction &amp; Photography</span>
+    </div>
+  </footer>
+
+</div>
+
+<script src="about.js"></script>
+</body>
+</html>
