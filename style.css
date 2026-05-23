@@ -44,21 +44,21 @@ body {
   cursor: none;
 }
 
-a, button { cursor: none; }
+* { cursor: none !important; }
 
 /* Custom cursor */
 #cursor {
   position: fixed;
   top: 0;
   left: 0;
-  width: 25px;
-  height: 25px;
+  width: 15px;
+  height: 15px;
   border-radius: 50%;
   background: #e8001c;
   pointer-events: none;
   z-index: 9999;
   transform: translate(-50%, -50%);
-  will-change: transform, left, top;
+  will-change: left, top;
 }
 
 @media (hover: none) {
@@ -70,14 +70,12 @@ a, button { cursor: none; }
 nav#mainNav {
   position: fixed;
   top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 1440px;
+  left: 0;
+  right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 max(20px, calc((100vw - 1440px) / 2 + 20px));
   height: 50px;
   background: transparent;
   border-bottom: 1px solid transparent;
