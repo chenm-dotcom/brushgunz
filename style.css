@@ -29,6 +29,7 @@
 html {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  cursor: none;
 }
 
 body {
@@ -40,6 +41,29 @@ body {
   overflow-x: hidden;
   max-width: 1440px;
   margin: 0 auto;
+  cursor: none;
+}
+
+a, button { cursor: none; }
+
+/* Custom cursor */
+#cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #e8001c;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  will-change: transform, left, top;
+}
+
+@media (hover: none) {
+  html, body, a, button { cursor: auto; }
+  #cursor { display: none; }
 }
 
 /* Nav ----------------------------------------------------------------------- */

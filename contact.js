@@ -1,3 +1,13 @@
+/* ── Custom cursor ───────────────────────────────────────────────────────── */
+(function () {
+  const cur = document.getElementById('cursor');
+  if (!cur) return;
+  document.addEventListener('mousemove', (e) => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top  = e.clientY + 'px';
+  }, { passive: true });
+})();
+
 /* ── Nav scroll ─────────────────────────────────────────────────────────── */
 const mainNav = document.getElementById('mainNav');
 window.addEventListener('scroll', () => {
