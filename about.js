@@ -37,6 +37,8 @@ cells.forEach(cell => observer.observe(cell));
 
   const S = 100;
   let x, y, vx, vy;
+  const label = bubble.querySelector('span');
+  let rafId;
 
   function randSpeed() { return 2.2 + Math.random() * 1.8; }
 
@@ -67,13 +69,17 @@ cells.forEach(cell => observer.observe(cell));
     const a = 50 + wave * 8, b = 50 - wave * 8;
     bubble.style.transform = `scaleX(${sx}) scaleY(${sy})`;
     bubble.style.borderRadius = `${a}% ${b}% ${b}% ${a}% / ${a}% ${a}% ${b}% ${b}%`;
-    const label = bubble.querySelector('span');
     if (label) label.style.transform = `scaleX(${1/sx}) scaleY(${1/sy})`;
-    requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(tick);
   }
 
   init();
-  requestAnimationFrame(tick);
+  rafId = requestAnimationFrame(tick);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) cancelAnimationFrame(rafId);
+    else rafId = requestAnimationFrame(tick);
+  });
 })();
 
 /* ── Mobile menu ─────────────────────────────────────────────────────────── */

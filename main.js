@@ -7,6 +7,7 @@ window.addEventListener('scroll', () => {
 /* ── Fit hero title to viewport ─────────────────────────────────────────── */
 function fitTitle() {
   const title = document.getElementById('heroTitle');
+  if (!title) return;
   title.style.fontSize = '200px';
   const ratio = window.innerWidth / title.offsetWidth;
   title.style.fontSize = Math.floor(200 * ratio) + 'px';
