@@ -30,7 +30,7 @@
       border-radius: 2px;
     }
 
-    /* Two-column body */
+    /* Two-column body: sidebar left, images right */
     .project-body {
       display: grid;
       grid-template-columns: 260px 1fr;
@@ -77,7 +77,8 @@
 
     .project-img-ph {
       width: 100%;
-      aspect-ratio: 9 / 16;
+      width: 500px;
+      height: 650px;
       background: #7e8c78;
       border-radius: 2px;
     }
@@ -138,6 +139,7 @@
       }
       .project-info { position: static; }
       .project-cover { aspect-ratio: 4 / 5; }
+      .project-img-ph { width: 100%; height: auto; aspect-ratio: 500 / 650; }
       .more-projects-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
@@ -186,7 +188,6 @@
   <div class="project-body">
 
     <aside class="project-info">
-
       <p class="project-desc">An intimate look inside MindSpace Israel — real people, real moments, shot with intention.</p>
       <div class="project-meta-row">
         <div class="project-meta-item">
