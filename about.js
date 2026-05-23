@@ -9,7 +9,7 @@ function fitTitle() {
   const title = document.getElementById('aboutTitle');
   if (!title) return;
   title.style.fontSize = '200px';
-  const ratio = document.body.offsetWidth / title.scrollWidth;
+  const ratio = window.innerWidth / title.scrollWidth;
   title.style.fontSize = Math.floor(200 * ratio) + 'px';
 }
 document.fonts.ready.then(() => {
@@ -51,7 +51,7 @@ cells.forEach(cell => observer.observe(cell));
     vy = Math.sin(angle) * spd;
   }
 
-  function tick() {
+  function tick(now) {
     const w = header.offsetWidth;
     const h = header.offsetHeight;
     x += vx; y += vy;
@@ -61,11 +61,19 @@ cells.forEach(cell => observer.observe(cell));
     if (y >= h - S) { y = h - S; vy = -randSpeed(); }
     bubble.style.left = x + 'px';
     bubble.style.top  = y + 'px';
+    const wave = Math.sin(now / 400);
+    const sy = 1 + wave * 0.06;
+    const sx = 1 - wave * 0.04;
+    const a = 50 + wave * 8, b = 50 - wave * 8;
+    bubble.style.transform = `scaleX(${sx}) scaleY(${sy})`;
+    bubble.style.borderRadius = `${a}% ${b}% ${b}% ${a}% / ${a}% ${a}% ${b}% ${b}%`;
+    const label = bubble.querySelector('span');
+    if (label) label.style.transform = `scaleX(${1/sx}) scaleY(${1/sy})`;
     requestAnimationFrame(tick);
   }
 
   init();
-  tick();
+  requestAnimationFrame(tick);
 })();
 
 /* ── Mobile menu ─────────────────────────────────────────────────────────── */
