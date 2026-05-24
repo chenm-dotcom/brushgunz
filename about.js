@@ -102,10 +102,9 @@ cells.forEach(cell => observer.observe(cell));
   }
 
   function handleOrientation(e) {
-    if (e.gamma == null) return;
     tiltEnabled = true;
-    tiltX = Math.max(-1, Math.min(1, e.gamma / 45));
-    tiltY = Math.max(-1, Math.min(1, ((e.beta || 0) - 30) / 45));
+    tiltX = Math.max(-1, Math.min(1, (e.gamma || 0) / 40));
+    tiltY = Math.max(-1, Math.min(1, ((e.beta  || 0) - 30) / 40));
   }
 
   function startOrientation() {
@@ -114,15 +113,15 @@ cells.forEach(cell => observer.observe(cell));
 
   if ('DeviceOrientationEvent' in window) {
     if (typeof DeviceOrientationEvent.requestPermission === 'function') {
-      // iOS 13+: tap the header to request permission (bubble has pointer-events:none)
-      header.addEventListener('click', function ask() {
-        header.removeEventListener('click', ask);
+      // iOS 13+: first touchstart anywhere triggers the permission dialog
+      document.addEventListener('touchstart', function ask() {
+        document.removeEventListener('touchstart', ask);
         DeviceOrientationEvent.requestPermission()
           .then(s => { if (s === 'granted') startOrientation(); })
           .catch(() => {});
       });
     } else {
-      // Android / older iOS: start immediately, no permission needed
+      // Android / older iOS: start immediately
       startOrientation();
     }
   }
