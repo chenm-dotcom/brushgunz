@@ -828,7 +828,7 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
 @media (max-width: 768px) {
   .about-header { padding: 40px 0 0; }
   .photo-grid   { grid-template-columns: 1fr 1fr; }
-  .bio-section  { padding: 28px 15px 48px; width: 85%; }
+  .bio-section  { padding: 58px 15px 48px; width: 90%; }
   .bio-black,
   .bio-blue     { font-size: 38px; }
 }
