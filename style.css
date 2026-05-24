@@ -858,7 +858,7 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
 .contact-links {
   display: flex;
   flex-direction: column;
-  gap: 0;
+  gap: 12px;
 }
 .contact-links a {
   font-family: 'PPEditorial', serif;
