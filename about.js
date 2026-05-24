@@ -1,3 +1,13 @@
+/* ── Custom cursor ───────────────────────────────────────────────────────── */
+(function () {
+  const cur = document.getElementById('cursor');
+  if (!cur) return;
+  document.addEventListener('mousemove', (e) => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top  = e.clientY + 'px';
+  }, { passive: true });
+})();
+
 /* ── Nav scroll ─────────────────────────────────────────────────────────── */
 const mainNav = document.getElementById('mainNav');
 window.addEventListener('scroll', () => {
@@ -29,7 +39,7 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 cells.forEach(cell => observer.observe(cell));
 
-/* ── About bubble — bounces around the header area ──────────────────────── */
+/* ── About bubble — bounces on desktop, tilt-driven on mobile ────────────── */
 (function () {
   const bubble = document.querySelector('.about-bubble');
   const header = document.querySelector('.about-header');
@@ -37,6 +47,10 @@ cells.forEach(cell => observer.observe(cell));
 
   const S = 100;
   let x, y, vx, vy;
+  const label = bubble.querySelector('span');
+  let rafId;
+  let tiltX = 0, tiltY = 0;
+  let tiltEnabled = false;
 
   function randSpeed() { return 2.2 + Math.random() * 1.8; }
 
@@ -54,11 +68,27 @@ cells.forEach(cell => observer.observe(cell));
   function tick(now) {
     const w = header.offsetWidth;
     const h = header.offsetHeight;
-    x += vx; y += vy;
-    if (x <= 0)     { x = 0;     vx =  randSpeed(); }
-    if (x >= w - S) { x = w - S; vx = -randSpeed(); }
-    if (y <= 0)     { y = 0;     vy =  randSpeed(); }
-    if (y >= h - S) { y = h - S; vy = -randSpeed(); }
+
+    if (tiltEnabled) {
+      vx = vx * 0.97 + tiltX * 0.6;
+      vy = vy * 0.97 + tiltY * 0.6;
+      const spd = Math.sqrt(vx * vx + vy * vy);
+      if (spd > 12) { vx = vx / spd * 12; vy = vy / spd * 12; }
+      // keep minimum movement so it never fully stops
+      if (spd < 0.5) { vx += (Math.random() - 0.5) * 0.8; vy += (Math.random() - 0.5) * 0.8; }
+      x += vx; y += vy;
+      if (x <= 0)     { x = 0;     vx =  Math.abs(vx) * 0.7 + 0.5; }
+      if (x >= w - S) { x = w - S; vx = -(Math.abs(vx) * 0.7 + 0.5); }
+      if (y <= 0)     { y = 0;     vy =  Math.abs(vy) * 0.7 + 0.5; }
+      if (y >= h - S) { y = h - S; vy = -(Math.abs(vy) * 0.7 + 0.5); }
+    } else {
+      x += vx; y += vy;
+      if (x <= 0)     { x = 0;     vx =  randSpeed(); }
+      if (x >= w - S) { x = w - S; vx = -randSpeed(); }
+      if (y <= 0)     { y = 0;     vy =  randSpeed(); }
+      if (y >= h - S) { y = h - S; vy = -randSpeed(); }
+    }
+
     bubble.style.left = x + 'px';
     bubble.style.top  = y + 'px';
     const wave = Math.sin(now / 400);
@@ -67,13 +97,42 @@ cells.forEach(cell => observer.observe(cell));
     const a = 50 + wave * 8, b = 50 - wave * 8;
     bubble.style.transform = `scaleX(${sx}) scaleY(${sy})`;
     bubble.style.borderRadius = `${a}% ${b}% ${b}% ${a}% / ${a}% ${a}% ${b}% ${b}%`;
-    const label = bubble.querySelector('span');
     if (label) label.style.transform = `scaleX(${1/sx}) scaleY(${1/sy})`;
-    requestAnimationFrame(tick);
+    rafId = requestAnimationFrame(tick);
+  }
+
+  function handleOrientation(e) {
+    tiltEnabled = true;
+    tiltX = Math.max(-1, Math.min(1, (e.gamma || 0) / 40));
+    tiltY = Math.max(-1, Math.min(1, ((e.beta  || 0) - 30) / 40));
+  }
+
+  function startOrientation() {
+    window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+  }
+
+  if ('DeviceOrientationEvent' in window) {
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // iOS 13+: first touchstart anywhere triggers the permission dialog
+      document.addEventListener('touchstart', function ask() {
+        document.removeEventListener('touchstart', ask);
+        DeviceOrientationEvent.requestPermission()
+          .then(s => { if (s === 'granted') startOrientation(); })
+          .catch(() => {});
+      });
+    } else {
+      // Android / older iOS: start immediately
+      startOrientation();
+    }
   }
 
   init();
-  requestAnimationFrame(tick);
+  rafId = requestAnimationFrame(tick);
+
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) cancelAnimationFrame(rafId);
+    else rafId = requestAnimationFrame(tick);
+  });
 })();
 
 /* ── Mobile menu ─────────────────────────────────────────────────────────── */

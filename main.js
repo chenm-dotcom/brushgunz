@@ -1,3 +1,13 @@
+/* ── Custom cursor ───────────────────────────────────────────────────────── */
+(function () {
+  const cur = document.getElementById('cursor');
+  if (!cur) return;
+  document.addEventListener('mousemove', (e) => {
+    cur.style.left = e.clientX + 'px';
+    cur.style.top  = e.clientY + 'px';
+  }, { passive: true });
+})();
+
 /* ── Nav scroll ─────────────────────────────────────────────────────────── */
 const mainNav = document.getElementById('mainNav');
 window.addEventListener('scroll', () => {
@@ -7,6 +17,7 @@ window.addEventListener('scroll', () => {
 /* ── Fit hero title to viewport ─────────────────────────────────────────── */
 function fitTitle() {
   const title = document.getElementById('heroTitle');
+  if (!title) return;
   title.style.fontSize = '200px';
   const ratio = window.innerWidth / title.offsetWidth;
   title.style.fontSize = Math.floor(200 * ratio) + 'px';
@@ -82,7 +93,7 @@ document.getElementById('slidePrev').addEventListener('click', () => {
 /* ── Floating hero bubbles ──────────────────────────────────────────────── */
 (function () {
   const hero   = document.getElementById('hero');
-  const words  = ['Creative', 'AI', 'Design', 'Social', 'Content', 'Photography'];
+  const words  = ['Creative', 'AI', 'Design', 'Social', 'Content', 'Photo'];
   const colors = ['#1a4aff', '#e8251a', '#1a1020', '#e8251a', '#1a4aff', '#1a1020'];
 
   function spawnBubble() {
