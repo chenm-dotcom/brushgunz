@@ -827,7 +827,9 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
 
 @media (max-width: 768px) {
   .about-header { padding: 40px 0 0; }
-  .bio-section  { padding: 28px 15px 48px; }
+  .bio-section  { padding: 28px 15px 48px; width: 85%; }
+  .bio-black,
+  .bio-blue     { font-size: 38px; }
 }
 
 /* ── Contact page ----------------------------------------------------------- */
