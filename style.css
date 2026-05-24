@@ -519,7 +519,7 @@ nav#mainNav.scrolled .nav-links a { color: var(--ink); }
 
 /* Footer -------------------------------------------------------------------- */
 footer {
-  margin-top: 40px;
+  margin-top: auto;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   background: var(--blue);
@@ -723,7 +723,7 @@ footer {
 }
 
 /* ── Shared page layout ----------------------------------------------------- */
-.page { padding-top: 50px; }
+.page { padding-top: 50px; display: flex; flex-direction: column; min-height: 100vh; }
 
 /* Nav on light-background pages (about, etc.) — links start dark ----------- */
 nav#mainNav.nav-light .nav-links a { color: var(--ink); }
