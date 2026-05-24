@@ -52,6 +52,7 @@ cells.forEach(cell => observer.observe(cell));
   let tiltX = 0, tiltY = 0;
 
   const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
+  let orientationActive = false;
 
   function randSpeed() { return 2.2 + Math.random() * 1.8; }
 
@@ -70,7 +71,7 @@ cells.forEach(cell => observer.observe(cell));
     const w = header.offsetWidth;
     const h = header.offsetHeight;
 
-    if (isMobile) {
+    if (isMobile && orientationActive) {
       // Tilt adds gravity-like acceleration; damping prevents runaway speed
       vx = vx * 0.97 + tiltX * 0.5;
       vy = vy * 0.97 + tiltY * 0.5;
@@ -82,6 +83,7 @@ cells.forEach(cell => observer.observe(cell));
       if (y <= 0)     { y = 0;     vy =  Math.abs(vy) * 0.7; }
       if (y >= h - S) { y = h - S; vy = -Math.abs(vy) * 0.7; }
     } else {
+      // Default bounce (desktop, or mobile before orientation activates)
       x += vx; y += vy;
       if (x <= 0)     { x = 0;     vx =  randSpeed(); }
       if (x >= w - S) { x = w - S; vx = -randSpeed(); }
@@ -103,6 +105,8 @@ cells.forEach(cell => observer.observe(cell));
 
   // Device orientation: gamma = left/right tilt, beta = front/back tilt
   function handleOrientation(e) {
+    if (e.gamma === null) return;
+    orientationActive = true;
     const gamma = e.gamma || 0;
     const beta  = (e.beta  || 0) - 30; // ~30° is natural phone-hold angle
     tiltX = Math.max(-1, Math.min(1, gamma / 45));
