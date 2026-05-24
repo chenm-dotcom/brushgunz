@@ -42,6 +42,7 @@
       position: sticky;
       top: 100px;
       align-self: start;
+      padding: 0 15px;
     }
 
     .project-desc {
@@ -71,12 +72,11 @@
     /* 2×2 image grid */
     .project-images {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 6px;
     }
 
     .project-img-ph {
-      width: 100%;
       width: 500px;
       height: 650px;
       background: #7e8c78;
@@ -133,11 +133,11 @@
 
     /* Responsive */
     @media (max-width: 768px) {
-      .project-body {
-        grid-template-columns: 1fr;
-        gap: 36px;
-      }
-      .project-info { position: static; }
+      .project-hero,
+      .project-body,
+      .more-projects { padding-left: 15px; padding-right: 15px; }
+      .project-body { grid-template-columns: 1fr; gap: 36px; }
+      .project-info { position: static; padding: 0; }
       .project-cover { aspect-ratio: 4 / 5; }
       .project-img-ph { width: 100%; height: auto; aspect-ratio: 500 / 650; }
       .more-projects-grid { grid-template-columns: repeat(2, 1fr); }
