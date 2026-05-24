@@ -50,9 +50,7 @@ cells.forEach(cell => observer.observe(cell));
   const label = bubble.querySelector('span');
   let rafId;
   let tiltX = 0, tiltY = 0;
-
-  const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
-  let orientationActive = false;
+  let tiltEnabled = false;
 
   function randSpeed() { return 2.2 + Math.random() * 1.8; }
 
@@ -71,19 +69,19 @@ cells.forEach(cell => observer.observe(cell));
     const w = header.offsetWidth;
     const h = header.offsetHeight;
 
-    if (isMobile && orientationActive) {
-      // Tilt adds gravity-like acceleration; damping prevents runaway speed
-      vx = vx * 0.97 + tiltX * 0.5;
-      vy = vy * 0.97 + tiltY * 0.5;
+    if (tiltEnabled) {
+      vx = vx * 0.97 + tiltX * 0.6;
+      vy = vy * 0.97 + tiltY * 0.6;
       const spd = Math.sqrt(vx * vx + vy * vy);
       if (spd > 12) { vx = vx / spd * 12; vy = vy / spd * 12; }
+      // keep minimum movement so it never fully stops
+      if (spd < 0.5) { vx += (Math.random() - 0.5) * 0.8; vy += (Math.random() - 0.5) * 0.8; }
       x += vx; y += vy;
-      if (x <= 0)     { x = 0;     vx =  Math.abs(vx) * 0.7; }
-      if (x >= w - S) { x = w - S; vx = -Math.abs(vx) * 0.7; }
-      if (y <= 0)     { y = 0;     vy =  Math.abs(vy) * 0.7; }
-      if (y >= h - S) { y = h - S; vy = -Math.abs(vy) * 0.7; }
+      if (x <= 0)     { x = 0;     vx =  Math.abs(vx) * 0.7 + 0.5; }
+      if (x >= w - S) { x = w - S; vx = -(Math.abs(vx) * 0.7 + 0.5); }
+      if (y <= 0)     { y = 0;     vy =  Math.abs(vy) * 0.7 + 0.5; }
+      if (y >= h - S) { y = h - S; vy = -(Math.abs(vy) * 0.7 + 0.5); }
     } else {
-      // Default bounce (desktop, or mobile before orientation activates)
       x += vx; y += vy;
       if (x <= 0)     { x = 0;     vx =  randSpeed(); }
       if (x >= w - S) { x = w - S; vx = -randSpeed(); }
@@ -103,35 +101,30 @@ cells.forEach(cell => observer.observe(cell));
     rafId = requestAnimationFrame(tick);
   }
 
-  // Device orientation: gamma = left/right tilt, beta = front/back tilt
   function handleOrientation(e) {
-    if (e.gamma === null) return;
-    orientationActive = true;
-    const gamma = e.gamma || 0;
-    const beta  = (e.beta  || 0) - 30; // ~30° is natural phone-hold angle
-    tiltX = Math.max(-1, Math.min(1, gamma / 45));
-    tiltY = Math.max(-1, Math.min(1, beta  / 45));
+    if (e.gamma == null) return;
+    tiltEnabled = true;
+    tiltX = Math.max(-1, Math.min(1, e.gamma / 45));
+    tiltY = Math.max(-1, Math.min(1, ((e.beta || 0) - 30) / 45));
   }
 
-  function enableOrientation() {
-    if (typeof DeviceOrientationEvent !== 'undefined' &&
-        typeof DeviceOrientationEvent.requestPermission === 'function') {
-      // iOS 13+ requires explicit permission from a user gesture
-      DeviceOrientationEvent.requestPermission()
-        .then(state => {
-          if (state === 'granted') {
-            window.addEventListener('deviceorientation', handleOrientation, { passive: true });
-          }
-        })
-        .catch(() => {});
-    } else if (typeof DeviceOrientationEvent !== 'undefined') {
-      // Android / older iOS — no permission needed
-      window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+  function startOrientation() {
+    window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+  }
+
+  if ('DeviceOrientationEvent' in window) {
+    if (typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // iOS 13+: tap the header to request permission (bubble has pointer-events:none)
+      header.addEventListener('click', function ask() {
+        header.removeEventListener('click', ask);
+        DeviceOrientationEvent.requestPermission()
+          .then(s => { if (s === 'granted') startOrientation(); })
+          .catch(() => {});
+      });
+    } else {
+      // Android / older iOS: start immediately, no permission needed
+      startOrientation();
     }
-  }
-
-  if (isMobile) {
-    document.addEventListener('touchstart', enableOrientation, { once: true });
   }
 
   init();
