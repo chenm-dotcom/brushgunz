@@ -39,7 +39,7 @@ const observer = new IntersectionObserver((entries) => {
 }, { threshold: 0.15 });
 cells.forEach(cell => observer.observe(cell));
 
-/* ── About bubble — bounces around the header area ──────────────────────── */
+/* ── About bubble — bounces on desktop, tilt-driven on mobile ────────────── */
 (function () {
   const bubble = document.querySelector('.about-bubble');
   const header = document.querySelector('.about-header');
@@ -49,6 +49,9 @@ cells.forEach(cell => observer.observe(cell));
   let x, y, vx, vy;
   const label = bubble.querySelector('span');
   let rafId;
+  let tiltX = 0, tiltY = 0;
+
+  const isMobile = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
   function randSpeed() { return 2.2 + Math.random() * 1.8; }
 
@@ -66,11 +69,26 @@ cells.forEach(cell => observer.observe(cell));
   function tick(now) {
     const w = header.offsetWidth;
     const h = header.offsetHeight;
-    x += vx; y += vy;
-    if (x <= 0)     { x = 0;     vx =  randSpeed(); }
-    if (x >= w - S) { x = w - S; vx = -randSpeed(); }
-    if (y <= 0)     { y = 0;     vy =  randSpeed(); }
-    if (y >= h - S) { y = h - S; vy = -randSpeed(); }
+
+    if (isMobile) {
+      // Tilt adds gravity-like acceleration; damping prevents runaway speed
+      vx = vx * 0.97 + tiltX * 0.5;
+      vy = vy * 0.97 + tiltY * 0.5;
+      const spd = Math.sqrt(vx * vx + vy * vy);
+      if (spd > 12) { vx = vx / spd * 12; vy = vy / spd * 12; }
+      x += vx; y += vy;
+      if (x <= 0)     { x = 0;     vx =  Math.abs(vx) * 0.7; }
+      if (x >= w - S) { x = w - S; vx = -Math.abs(vx) * 0.7; }
+      if (y <= 0)     { y = 0;     vy =  Math.abs(vy) * 0.7; }
+      if (y >= h - S) { y = h - S; vy = -Math.abs(vy) * 0.7; }
+    } else {
+      x += vx; y += vy;
+      if (x <= 0)     { x = 0;     vx =  randSpeed(); }
+      if (x >= w - S) { x = w - S; vx = -randSpeed(); }
+      if (y <= 0)     { y = 0;     vy =  randSpeed(); }
+      if (y >= h - S) { y = h - S; vy = -randSpeed(); }
+    }
+
     bubble.style.left = x + 'px';
     bubble.style.top  = y + 'px';
     const wave = Math.sin(now / 400);
@@ -81,6 +99,35 @@ cells.forEach(cell => observer.observe(cell));
     bubble.style.borderRadius = `${a}% ${b}% ${b}% ${a}% / ${a}% ${a}% ${b}% ${b}%`;
     if (label) label.style.transform = `scaleX(${1/sx}) scaleY(${1/sy})`;
     rafId = requestAnimationFrame(tick);
+  }
+
+  // Device orientation: gamma = left/right tilt, beta = front/back tilt
+  function handleOrientation(e) {
+    const gamma = e.gamma || 0;
+    const beta  = (e.beta  || 0) - 30; // ~30° is natural phone-hold angle
+    tiltX = Math.max(-1, Math.min(1, gamma / 45));
+    tiltY = Math.max(-1, Math.min(1, beta  / 45));
+  }
+
+  function enableOrientation() {
+    if (typeof DeviceOrientationEvent !== 'undefined' &&
+        typeof DeviceOrientationEvent.requestPermission === 'function') {
+      // iOS 13+ requires explicit permission from a user gesture
+      DeviceOrientationEvent.requestPermission()
+        .then(state => {
+          if (state === 'granted') {
+            window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+          }
+        })
+        .catch(() => {});
+    } else if (typeof DeviceOrientationEvent !== 'undefined') {
+      // Android / older iOS — no permission needed
+      window.addEventListener('deviceorientation', handleOrientation, { passive: true });
+    }
+  }
+
+  if (isMobile) {
+    document.addEventListener('touchstart', enableOrientation, { once: true });
   }
 
   init();
