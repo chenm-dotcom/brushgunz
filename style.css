@@ -396,6 +396,7 @@ nav#mainNav.scrolled .nav-links a { color: var(--ink); }
   line-height: 1.15;
   color: #1e2255;
   letter-spacing: -.01em;
+  text-wrap: balance;
 }
 
 /* Work grid ----------------------------------------------------------------- */
@@ -823,6 +824,7 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
   color: var(--navy);
   max-width: 520px;
   margin-bottom: 60px;
+  text-wrap: pretty;
 }
 .contact-intro em { font-style: normal; }
 .contact-links {
