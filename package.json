@@ -1,0 +1,13 @@
+{
+  "name": "brushgunz-uploader",
+  "version": "1.0.0",
+  "description": "Compress and upload images/videos to WordPress",
+  "scripts": {
+    "upload": "node upload-to-wp.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "form-data": "^4.0.0",
+    "sharp": "^0.33.0"
+  }
+}
