@@ -123,6 +123,8 @@ nav#mainNav.scrolled .nav-links a { color: var(--ink); }
   opacity: 0;
   transition: opacity 1s ease;
   will-change: opacity;
+  background-size: cover;
+  background-position: center center;
 }
 .hero-slide::after {
   content: '';
@@ -306,6 +308,8 @@ nav#mainNav.scrolled .nav-links a { color: var(--ink); }
   inset: 0;
   opacity: 0;
   transition: opacity 1s ease;
+  background-size: cover;
+  background-position: center center;
 }
 .slide-zone {
   position: absolute;
@@ -421,6 +425,8 @@ nav#mainNav.scrolled .nav-links a { color: var(--ink); }
   overflow: hidden;
   border: 2.5px solid transparent;
   background: #c8c8c8;
+  background-size: cover;
+  background-position: center center;
   transition: border-color .25s;
 }
 .grid-card:hover .grid-card-img { border-color: var(--blue); }
@@ -525,6 +531,8 @@ footer {
   height: 90px;
   border-radius: 4px;
   background: rgba(255,255,255,.22);
+  background-size: cover;
+  background-position: center center;
   flex-shrink: 0;
 }
 .footer-desc {
@@ -767,6 +775,8 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
   opacity: 0;
   transform: translateY(20px);
   transition: opacity .7s ease, transform .7s ease;
+  background-size: cover;
+  background-position: center center;
 }
 .photo-cell.visible { opacity: 1; transform: translateY(0); }
 .photo-cell:nth-child(1) { transition-delay: 0s; }
