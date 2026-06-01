@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build a Poster — Mindspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <!-- Core brand fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Adventure fonts (loaded but applied only in adventure mode) -->
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Bebas+Neue&family=Abril+Fatface&family=Space+Mono:ital@0;1&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ══ MOBILE WALL ══════════════════════════════════════════════════════════ -->
+<div class="mobile-wall" id="mobileWall">
+  <div class="mw-inner">
+    <div class="mw-laptop" aria-hidden="true">
+      <div class="mw-lid"><div class="mw-screen"><div class="mw-screen-content">
+        <div class="mw-bar w70"></div><div class="mw-bar w50"></div>
+        <div class="mw-bar w80"></div><div class="mw-rect"></div>
+      </div></div></div>
+      <div class="mw-base"><div class="mw-keyboard"></div></div>
+    </div>
+    <h2>Seriously though,<br>a poster? On this?</h2>
+    <p>This tool is built for a real screen.<br>Go grab your laptop — we promise<br>it's worth it.</p>
+    <div class="mw-tag">☕ We'll be here.</div>
+  </div>
+</div>
+
+<!-- ══ APP ══════════════════════════════════════════════════════════════════ -->
+<div class="app" id="app">
+
+  <nav class="nav">
+    <button class="nav-logo" id="navLogo">
+      <span class="nl-dot"></span>
+      <span>Mindspace</span>
+      <span class="nl-sep">/</span>
+      <span class="nl-sub">Poster Builder</span>
+    </button>
+    <span class="nav-hint">desktop tool · no design skills needed</span>
+  </nav>
+
+  <!-- ══ PICK ══════════════════════════════════════════════════════════════ -->
+  <div class="screen" id="screen-pick">
+    <div class="pick-head">
+      <h1>What are you<br>making today?</h1>
+      <p>Pick one. Your poster is ready in under a minute.</p>
+    </div>
+    <div class="pick-grid">
+
+      <button class="pcard" data-tpl="event" style="--bg:#d6c6f0;--fg:#1a0d38">
+        <div class="pc-top"><span class="pc-tag">Event</span><span class="pc-emoji">🎉</span></div>
+        <div class="pc-headline">Something fun<br>is happening.</div>
+        <p class="pc-sub">Mindspace Hours, parties,<br>dog playdates, you name it.</p>
+        <div class="pc-btn">Make it →</div>
+      </button>
+
+      <button class="pcard" data-tpl="spotlight" style="--bg:#b8ccec;--fg:#0a1e38">
+        <div class="pc-top"><span class="pc-tag">Spotlight</span><span class="pc-emoji">✨</span></div>
+        <div class="pc-headline">Someone here<br>is doing big things.</div>
+        <p class="pc-sub">Introduce a member.<br>Make them feel seen.</p>
+        <div class="pc-btn">Make it →</div>
+      </button>
+
+      <button class="pcard" data-tpl="offer" style="--bg:#a8d0b0;--fg:#081c10">
+        <div class="pc-top"><span class="pc-tag">Member Special</span><span class="pc-emoji">🎁</span></div>
+        <div class="pc-headline">A deal too<br>good to miss.</div>
+        <p class="pc-sub">Discounts, perks, offers —<br>make it look as good as it sounds.</p>
+        <div class="pc-btn">Make it →</div>
+      </button>
+
+      <button class="pcard" data-tpl="announcement" style="--bg:#e07858;--fg:#180800">
+        <div class="pc-top"><span class="pc-tag">Announcement</span><span class="pc-emoji">📣</span></div>
+        <div class="pc-headline">Quick. Clear.<br>Impossible to miss.</div>
+        <p class="pc-sub">Where we are, what's changed,<br>who to call.</p>
+        <div class="pc-btn">Make it →</div>
+      </button>
+
+    </div>
+  </div>
+
+  <!-- ══ BUILD ══════════════════════════════════════════════════════════════ -->
+  <div class="screen hidden" id="screen-build">
+    <div class="build-wrap">
+
+      <!-- FORM PANEL -->
+      <aside class="form-panel">
+
+        <div class="fp-header">
+          <button class="btn-back" id="btnBack">← Back</button>
+          <div class="fp-title-row">
+            <h2 id="formTitle">Event Poster</h2>
+            <button class="btn-adventure" id="btnAdventure" title="Adventure Design — unlock more colours & fonts">
+              🎨 Adventure
+            </button>
+          </div>
+          <p class="fp-hint" id="formHint">Fill in the details — your poster updates live.</p>
+        </div>
+
+        <div class="fp-body">
+          <div id="formFields"></div>
+
+          <!-- ADVENTURE: Font picker (hidden by default) -->
+          <div class="adv-section hidden" id="advFontSection">
+            <label class="field-label">Adventure font</label>
+            <div class="font-picker" id="fontPicker"></div>
+          </div>
+
+          <div class="color-block">
+            <label class="field-label">Background colour</label>
+            <div class="color-row" id="colorRow"></div>
+          </div>
+        </div>
+
+        <div class="fp-footer">
+          <button class="btn-dl" id="btnDownload">
+            <svg viewBox="0 0 18 18" fill="none"><path d="M9 2v10M5 8l4 4 4-4M2 14h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Download PNG
+          </button>
+          <button class="btn-print" id="btnPrint">Print / Save as PDF</button>
+        </div>
+
+      </aside>
+
+      <!-- PREVIEW -->
+      <div class="preview-panel">
+        <div class="preview-label">Live preview</div>
+        <div class="preview-stage">
+          <div class="poster" id="poster"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
