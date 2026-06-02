@@ -113,10 +113,133 @@ add_action('admin_menu', function () {
 
 /* ── Admin: enqueue media uploader + admin JS/CSS ───────────────────────── */
 add_action('admin_enqueue_scripts', function ($hook) {
-    if ($hook !== 'toplevel_page_brushgunz') return;
+    $on_custom = $hook === 'toplevel_page_brushgunz';
+    $on_page   = in_array($hook, ['post.php', 'post-new.php'], true);
+    if (!$on_custom && !$on_page) return;
     wp_enqueue_media();
     wp_enqueue_script('bg-admin', get_template_directory_uri() . '/admin/options.js', ['jquery'], null, true);
     wp_add_inline_style('wp-admin', bg_admin_css());
+});
+
+/* ── Per-page meta boxes (edit each page to manage its images) ───────────── */
+add_action('add_meta_boxes_page', function ($post) {
+    $home_id    = (int) get_option('page_on_front');
+    $about_page = get_page_by_path('about');
+    $about_id   = $about_page ? $about_page->ID : 0;
+    $contact    = get_page_by_path('contact');
+    $contact_id = $contact ? $contact->ID : 0;
+
+    if ($post->ID === $home_id) {
+        add_meta_box('bg_hero_box',   '🎞 Hero Slides',   'bg_metabox_hero',    'page', 'normal', 'high');
+        add_meta_box('bg_slider_box', '🖼 Image Slider',  'bg_metabox_slider',  'page', 'normal', 'high');
+    }
+    if ($about_id && $post->ID === $about_id) {
+        add_meta_box('bg_about_box',  '📷 About Photos',  'bg_metabox_about',   'page', 'normal', 'high');
+    }
+    if ($contact_id && $post->ID === $contact_id) {
+        add_meta_box('bg_contact_box','✉️ Contact Info',   'bg_metabox_contact', 'page', 'normal', 'high');
+    }
+});
+
+function bg_metabox_hero($post) {
+    wp_nonce_field('bg_save_page_meta', 'bg_page_nonce');
+    echo '<p style="color:#666;margin:0 0 12px">Full-screen images or videos that cycle behind the Brushgunz title. Add one or more.</p>';
+    echo '<div class="bg-list" id="bg-hero-list" data-name="bg_hero_slides">';
+    foreach (bg_ids('bg_hero_slides') as $id) bg_admin_row('bg_hero_slides', $id);
+    echo '</div>';
+    echo '<button type="button" class="button button-secondary bg-add-btn" data-list="bg-hero-list" data-name="bg_hero_slides">+ Add Slide</button>';
+}
+
+function bg_metabox_slider($post) {
+    echo '<p style="color:#666;margin:0 0 12px">Photos or videos in the horizontal strip on the home page. Add as many as you like.</p>';
+    echo '<div class="bg-list" id="bg-slider-list" data-name="bg_slider_images">';
+    foreach (bg_ids('bg_slider_images') as $id) bg_admin_row('bg_slider_images', $id);
+    echo '</div>';
+    echo '<button type="button" class="button button-secondary bg-add-btn" data-list="bg-slider-list" data-name="bg_slider_images">+ Add Slide</button>';
+}
+
+function bg_metabox_about($post) {
+    wp_nonce_field('bg_save_page_meta', 'bg_page_nonce');
+    $cells  = array_pad(bg_ids('bg_about_photos'), 4, 0);
+    $labels = ['Top Left', 'Top Right', 'Bottom Left', 'Bottom Right'];
+    echo '<p style="color:#666;margin:0 0 12px">The 2×2 photo grid shown on the About page.</p>';
+    echo '<div class="bg-about-grid">';
+    for ($i = 0; $i < 4; $i++) {
+        echo '<div class="bg-about-cell"><strong>' . $labels[$i] . '</strong>';
+        bg_admin_row('bg_about_photos', $cells[$i]);
+        echo '</div>';
+    }
+    echo '</div>';
+
+    $pid  = absint(get_option('bg_profile_pic', 0));
+    $purl = $pid ? wp_get_attachment_image_url($pid, 'medium') : '';
+    echo '<h3 style="margin-top:24px">Profile Photo</h3>';
+    echo '<p style="color:#666;margin:0 0 12px">Portrait shown in the footer across the site.</p>';
+    echo '<input type="hidden" name="bg_profile_pic" id="bg-profile-id" value="' . $pid . '">';
+    echo '<div class="bg-single-preview" id="bg-profile-preview">';
+    if ($purl) echo '<img src="' . esc_url($purl) . '" alt="">';
+    echo '</div>';
+    echo '<button type="button" class="button bg-pick-single">' . ($pid ? 'Change Photo' : 'Upload Photo') . '</button>';
+    if ($pid) echo '<button type="button" class="button bg-remove-single" style="margin-left:8px">Remove</button>';
+}
+
+function bg_metabox_contact($post) {
+    wp_nonce_field('bg_save_page_meta', 'bg_page_nonce');
+    $phone = esc_attr(get_option('bg_contact_phone',     '+972 45 447 5675'));
+    $email = esc_attr(get_option('bg_contact_email',     'chen@brushgunz.com'));
+    $ig    = esc_attr(get_option('bg_contact_instagram', 'chenhanozel'));
+    echo '
+    <table class="form-table" style="margin-top:0">
+      <tr>
+        <th style="width:100px"><label for="bg_meta_phone">Phone</label></th>
+        <td><input type="text"  id="bg_meta_phone" name="bg_contact_phone" value="' . $phone . '" class="regular-text"></td>
+      </tr>
+      <tr>
+        <th><label for="bg_meta_email">Email</label></th>
+        <td><input type="email" id="bg_meta_email" name="bg_contact_email" value="' . $email . '" class="regular-text"></td>
+      </tr>
+      <tr>
+        <th><label for="bg_meta_ig">Instagram</label></th>
+        <td><span style="line-height:30px;margin-right:4px">@</span>
+            <input type="text" id="bg_meta_ig" name="bg_contact_instagram" value="' . $ig . '" style="width:240px"></td>
+      </tr>
+    </table>';
+}
+
+/* ── Save meta box data on page update ───────────────────────────────────── */
+add_action('save_post_page', function ($post_id) {
+    if (!isset($_POST['bg_page_nonce']) || !wp_verify_nonce($_POST['bg_page_nonce'], 'bg_save_page_meta')) return;
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
+    if (!current_user_can('edit_post', $post_id)) return;
+
+    $home_id    = (int) get_option('page_on_front');
+    $about_page = get_page_by_path('about');
+    $about_id   = $about_page ? $about_page->ID : 0;
+    $contact    = get_page_by_path('contact');
+    $contact_id = $contact ? $contact->ID : 0;
+
+    if ($post_id === $home_id) {
+        if (isset($_POST['bg_hero_slides']))
+            update_option('bg_hero_slides', array_values(array_filter(array_map('absint', (array) $_POST['bg_hero_slides']))));
+        if (isset($_POST['bg_slider_images']))
+            update_option('bg_slider_images', array_values(array_filter(array_map('absint', (array) $_POST['bg_slider_images']))));
+    }
+    if ($about_id && $post_id === $about_id) {
+        if (isset($_POST['bg_about_photos'])) {
+            $photos = array_map('absint', array_slice((array) $_POST['bg_about_photos'], 0, 4));
+            update_option('bg_about_photos', array_pad($photos, 4, 0));
+        }
+        if (isset($_POST['bg_profile_pic']))
+            update_option('bg_profile_pic', absint($_POST['bg_profile_pic']));
+    }
+    if ($contact_id && $post_id === $contact_id) {
+        if (isset($_POST['bg_contact_phone']))
+            update_option('bg_contact_phone', sanitize_text_field($_POST['bg_contact_phone']));
+        if (isset($_POST['bg_contact_email']))
+            update_option('bg_contact_email', sanitize_email($_POST['bg_contact_email']));
+        if (isset($_POST['bg_contact_instagram']))
+            update_option('bg_contact_instagram', sanitize_text_field($_POST['bg_contact_instagram']));
+    }
 });
 
 function bg_admin_css() {

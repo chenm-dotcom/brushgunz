@@ -76,19 +76,14 @@ nav#mainNav {
   align-items: center;
   padding: 0 20px;
   height: 50px;
-  background: transparent;
-  border-bottom: 1px solid transparent;
-  transition: background .4s ease, backdrop-filter .4s ease,
-              -webkit-backdrop-filter .4s ease, border-color .4s ease;
-}
-nav#mainNav.scrolled {
   background: rgba(255,255,255,.18);
   backdrop-filter: blur(28px) saturate(180%);
   -webkit-backdrop-filter: blur(28px) saturate(180%);
   border-bottom: 1px solid rgba(255,255,255,.3);
   box-shadow: 0 4px 32px rgba(0,0,0,.12);
 }
-nav#mainNav.scrolled .nav-links a { color: var(--ink); }
+nav#mainNav .nav-links a { color: var(--ink); }
+nav#mainNav.scrolled { /* already styled above — no change on scroll */ }
 
 .nav-links {
   display: flex;
@@ -733,8 +728,7 @@ footer {
 .page { padding-top: 50px; }
 
 /* Nav on light-background pages (about, etc.) — links start dark ----------- */
-nav#mainNav.nav-light .nav-links a { color: var(--ink); }
-nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
+/* nav link color is always --ink (set in base rule above) */
 
 /* ── About page ------------------------------------------------------------- */
 .about-header {
