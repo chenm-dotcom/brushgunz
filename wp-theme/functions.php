@@ -87,12 +87,18 @@ function bg_contact($key, $default = '') {
 
 /* ── Admin: register settings ───────────────────────────────────────────── */
 add_action('admin_init', function () {
-    $array_keys = ['bg_hero_slides', 'bg_slider_images', 'bg_about_photos'];
-    foreach ($array_keys as $k)
+    foreach (['bg_hero_slides', 'bg_slider_images'] as $k)
         register_setting('bg_options', $k, ['sanitize_callback' => function ($v) {
             if (!is_array($v)) return [];
             return array_values(array_filter(array_map('absint', $v)));
         }]);
+
+    // Preserve slot positions for the fixed 4-cell about grid (zeros kept as placeholders).
+    register_setting('bg_options', 'bg_about_photos', ['sanitize_callback' => function ($v) {
+        if (!is_array($v)) return [0, 0, 0, 0];
+        $out = array_map('absint', array_slice($v, 0, 4));
+        return array_pad($out, 4, 0);
+    }]);
 
     register_setting('bg_options', 'bg_profile_pic',        ['sanitize_callback' => 'absint']);
     register_setting('bg_options', 'bg_contact_phone',      ['sanitize_callback' => 'sanitize_text_field']);
