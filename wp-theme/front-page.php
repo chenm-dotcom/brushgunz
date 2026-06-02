@@ -70,7 +70,7 @@
       while ($q->have_posts()):
           $q->the_post();
           $cat   = esc_html(get_post_meta(get_the_ID(), '_bg_cat', true));
-          $thumb = get_the_post_thumbnail_url(null, 'large');
+          $thumb = bg_media_url(get_post_thumbnail_id(), 'large');
       ?>
         <li class="grid-card">
           <span class="grid-card-cat"><?php echo $cat; ?></span>
@@ -91,7 +91,7 @@
 <?php
 $profile_url = '';
 $pid = absint(get_option('bg_profile_pic', 0));
-if ($pid) $profile_url = wp_get_attachment_image_url($pid, 'medium_large');
+if ($pid) $profile_url = bg_media_url($pid, 'medium_large');
 $email    = get_option('bg_contact_email',     'chen@brushgunz.com');
 $ig       = get_option('bg_contact_instagram', 'chenhanozel');
 ?>

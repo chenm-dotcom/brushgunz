@@ -65,17 +65,28 @@ function bg_ids($key) {
     return array_values(array_filter(array_map('absint', $v)));
 }
 
-/* ── Helper: render one media slot (image or video) ─────────────────────── */
+/* ── Helper: return correct URL for any media type ───────────────────────── */
+// GIFs and videos always use the original file so animation / playback is preserved.
+// Resized copies created by WordPress strip GIF animation and can't play video.
+function bg_media_url($id, $size = 'full') {
+    if (!$id) return '';
+    $mime = get_post_mime_type($id);
+    if (!$mime) return '';
+    if ($mime === 'image/gif' || strpos($mime, 'video') !== false)
+        return (string) wp_get_attachment_url($id);
+    return (string) wp_get_attachment_image_url($id, $size);
+}
+
+/* ── Helper: render one media slot (image, GIF, or video) ───────────────── */
 function bg_slide_html($id, $class = '') {
     if (!$id) return;
     $mime = get_post_mime_type($id);
-    $wrap_open  = '<div class="' . esc_attr($class) . '">';
-    $wrap_close = '</div>';
+    if (!$mime) return;
     if (strpos($mime, 'video') !== false) {
         $url = wp_get_attachment_url($id);
-        echo $wrap_open . '<video autoplay muted loop playsinline><source src="' . esc_url($url) . '"></video>' . $wrap_close;
+        echo '<div class="' . esc_attr($class) . '"><video autoplay muted loop playsinline><source src="' . esc_url($url) . '"></video></div>';
     } else {
-        $url = wp_get_attachment_image_url($id, 'full');
+        $url = bg_media_url($id, 'full');
         echo '<div class="' . esc_attr($class) . '" style="background-image:url(\'' . esc_url($url) . '\')"></div>';
     }
 }
@@ -172,7 +183,7 @@ function bg_metabox_about($post) {
     echo '</div>';
 
     $pid  = absint(get_option('bg_profile_pic', 0));
-    $purl = $pid ? wp_get_attachment_image_url($pid, 'medium') : '';
+    $purl = $pid ? bg_media_url($pid, 'medium') : '';
     echo '<h3 style="margin-top:24px">Profile Photo</h3>';
     echo '<p style="color:#666;margin:0 0 12px">Portrait shown in the footer across the site.</p>';
     echo '<input type="hidden" name="bg_profile_pic" id="bg-profile-id" value="' . $pid . '">';
@@ -315,7 +326,7 @@ function bg_settings_page() {
                 <p>Portrait in the footer of the home and about pages.</p>
                 <?php
                 $pid  = absint(get_option('bg_profile_pic', 0));
-                $purl = $pid ? wp_get_attachment_image_url($pid, 'medium') : '';
+                $purl = $pid ? bg_media_url($pid, 'medium') : '';
                 ?>
                 <input type="hidden" name="bg_profile_pic" id="bg-profile-id" value="<?php echo $pid; ?>">
                 <div class="bg-single-preview" id="bg-profile-preview">
@@ -362,9 +373,10 @@ function bg_settings_page() {
 
 /* ── Admin: render one media row ─────────────────────────────────────────── */
 function bg_admin_row($name, $id = 0) {
-    $url   = $id ? wp_get_attachment_image_url($id, 'medium') : '';
     $mime  = $id ? get_post_mime_type($id) : '';
     $video = $mime && strpos($mime, 'video') !== false;
+    // GIFs must use the original URL — resized copies lose animation.
+    $url   = $id ? bg_media_url($id, 'medium') : '';
     ?>
     <div class="bg-row">
         <input type="hidden" name="<?php echo esc_attr($name); ?>[]" class="bg-id" value="<?php echo (int) $id; ?>">

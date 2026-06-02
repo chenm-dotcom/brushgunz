@@ -13,7 +13,7 @@
   <?php $cells = array_pad(bg_ids('bg_about_photos'), 4, 0); ?>
   <div class="photo-grid" aria-hidden="true">
     <?php foreach (['c1','c2','c3','c4'] as $i => $cls):
-      $url = $cells[$i] ? wp_get_attachment_image_url($cells[$i], 'large') : '';
+      $url = $cells[$i] ? bg_media_url($cells[$i], 'large') : '';
     ?>
       <div class="photo-cell <?php echo $cls; ?>"<?php if ($url) echo ' style="background-image:url(\'' . esc_url($url) . '\')"'; ?>></div>
     <?php endforeach; ?>
@@ -28,7 +28,7 @@
   <!-- FOOTER --------------------------------------------------------------- -->
   <?php
   $pid = absint(get_option('bg_profile_pic', 0));
-  $profile_url = $pid ? wp_get_attachment_image_url($pid, 'medium_large') : '';
+  $profile_url = $pid ? bg_media_url($pid, 'medium_large') : '';
   $email = get_option('bg_contact_email',     'chen@brushgunz.com');
   $ig    = get_option('bg_contact_instagram', 'chenhanozel');
   ?>
