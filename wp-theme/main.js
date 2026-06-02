@@ -21,7 +21,7 @@ const heroSlides = Array.from(document.querySelectorAll('.hero-slide'));
 let heroIdx = 0;
 let heroTimer = null;
 
-heroSlides[0].style.opacity = '1';
+if (heroSlides.length) heroSlides[0].style.opacity = '1';
 
 function goHero(i) {
   heroSlides[heroIdx].style.opacity = '0';
@@ -30,7 +30,8 @@ function goHero(i) {
 }
 
 function startHeroTimer() {
-  heroTimer = setInterval(() => goHero(heroIdx + 1), 5000);
+  if (heroSlides.length > 1)
+    heroTimer = setInterval(() => goHero(heroIdx + 1), 5000);
 }
 
 startHeroTimer();
@@ -54,7 +55,7 @@ const imgSlides = Array.from(document.querySelectorAll('.img-slide'));
 let imgIdx = 0;
 let imgTimer = null;
 
-imgSlides[0].style.opacity = '1';
+if (imgSlides.length) imgSlides[0].style.opacity = '1';
 
 function goSlide(i) {
   imgSlides[imgIdx].style.opacity = '0';
@@ -63,7 +64,8 @@ function goSlide(i) {
 }
 
 function startSlideTimer() {
-  imgTimer = setInterval(() => goSlide(imgIdx + 1), 5000);
+  if (imgSlides.length > 1)
+    imgTimer = setInterval(() => goSlide(imgIdx + 1), 5000);
 }
 
 startSlideTimer();
