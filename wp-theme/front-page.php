@@ -37,20 +37,15 @@
   </section>
 
   <!-- TICKER --------------------------------------------------------------- -->
+  <?php
+  $ticker = esc_html(get_option('bg_ticker_text', 'Less bullshit, more creative stuff ppl. Please.'));
+  $ticker_item = '<span class="ticker-item">' . $ticker . '</span><span class="ticker-dot"></span>';
+  $ticker_row  = str_repeat($ticker_item, 4);
+  ?>
   <div class="ticker" aria-hidden="true">
     <div class="ticker-inner" id="tickerInner">
-      <span class="ticker-half" id="tickerHalf1">
-        <span class="ticker-item">Less bullshit, more creative stuff ppl. Please.</span><span class="ticker-dot"></span>
-        <span class="ticker-item">Less bullshit, more creative stuff ppl. Please.</span><span class="ticker-dot"></span>
-        <span class="ticker-item">Less bullshit, more creative stuff ppl. Please.</span><span class="ticker-dot"></span>
-        <span class="ticker-item">Less bullshit, more creative stuff ppl. Please.</span><span class="ticker-dot"></span>
-      </span>
-      <span class="ticker-half" id="tickerHalf2">
-        <span class="ticker-item">Less bullshit, more creative stuff ppl. Please.</span><span class="ticker-dot"></span>
-        <span class="ticker-item">Less bullshit, more creative stuff ppl. Please.</span><span class="ticker-dot"></span>
-        <span class="ticker-item">Less bullshit, more creative stuff ppl. Please.</span><span class="ticker-dot"></span>
-        <span class="ticker-item">Less bullshit, more creative stuff ppl. Please.</span><span class="ticker-dot"></span>
-      </span>
+      <span class="ticker-half" id="tickerHalf1"><?php echo $ticker_row; ?></span>
+      <span class="ticker-half" id="tickerHalf2"><?php echo $ticker_row; ?></span>
     </div>
   </div>
 

@@ -115,6 +115,7 @@ add_action('admin_init', function () {
     register_setting('bg_options', 'bg_contact_phone',      ['sanitize_callback' => 'sanitize_text_field']);
     register_setting('bg_options', 'bg_contact_email',      ['sanitize_callback' => 'sanitize_email']);
     register_setting('bg_options', 'bg_contact_instagram',  ['sanitize_callback' => 'sanitize_text_field']);
+    register_setting('bg_options', 'bg_ticker_text',        ['sanitize_callback' => 'sanitize_text_field']);
 });
 
 /* ── Admin: menu page ───────────────────────────────────────────────────── */
@@ -156,7 +157,7 @@ function bg_admin_css() {
 /* ── Admin: settings page HTML ──────────────────────────────────────────── */
 function bg_settings_page() {
     $tab  = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'hero';
-    $tabs = ['hero' => 'Hero Slides', 'slider' => 'Image Slider', 'about' => 'About Photos', 'contact' => 'Contact Info'];
+    $tabs = ['hero' => 'Hero Slides', 'slider' => 'Image Slider', 'about' => 'About Photos', 'ticker' => 'Ticker', 'contact' => 'Contact Info'];
     ?>
     <div class="wrap bg-admin">
         <h1>Brushgunz Media Manager</h1>
@@ -218,6 +219,21 @@ function bg_settings_page() {
                 <?php if ($pid): ?>
                     <button type="button" class="button bg-remove-single" style="margin-left:8px">Remove</button>
                 <?php endif; ?>
+
+            <?php elseif ($tab === 'ticker'): ?>
+                <h2>Ticker Text</h2>
+                <p>The scrolling marquee line on the homepage. Keep it short and punchy — it repeats automatically.</p>
+                <table class="form-table">
+                    <tr>
+                        <th scope="row"><label for="bg_ticker">Ticker message</label></th>
+                        <td>
+                            <input type="text" id="bg_ticker" name="bg_ticker_text"
+                                 value="<?php echo esc_attr(get_option('bg_ticker_text', 'Less bullshit, more creative stuff ppl. Please.')); ?>"
+                                 class="large-text">
+                            <p class="description">The dot separator between repetitions is added automatically.</p>
+                        </td>
+                    </tr>
+                </table>
 
             <?php elseif ($tab === 'contact'): ?>
                 <h2>Contact Info</h2>
