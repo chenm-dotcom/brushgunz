@@ -9,11 +9,18 @@ $ig    = get_option('bg_contact_instagram', 'chenhanozel');
 <main class="contact-page">
 
   <div class="contact-body">
-    <p class="contact-intro">
-      If you like what you saw here and wanna chitchat,
-      you can either call me, send me an email,
-      or DM me on Instagram since I'm there all the time.
-    </p>
+    <?php
+    $blocks  = parse_blocks(get_post_field('post_content', get_the_ID()));
+    $intro   = '';
+    foreach ($blocks as $b) {
+        if ($b['blockName'] === 'core/paragraph') {
+            $intro = wp_kses_post($b['innerHTML']);
+            break;
+        }
+    }
+    if (!$intro) $intro = '<p>If you like what you saw here and wanna chitchat, you can either call me, send me an email, or DM me on Instagram since I\'m there all the time.</p>';
+    ?>
+    <div class="contact-intro"><?php echo $intro; ?></div>
 
     <div class="contact-links">
       <a href="tel:<?php echo esc_attr(preg_replace('/\s+/', '', $phone)); ?>"><?php echo esc_html($phone); ?></a>

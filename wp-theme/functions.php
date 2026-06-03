@@ -15,13 +15,13 @@ add_action('wp_enqueue_scripts', function () {
         $raw   = get_option('bg_bubble_words', "Creative\nAI\nDesign\nSocial\nContent\nPhotography");
         $words = array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", '', $raw)))));
         wp_localize_script('bg-main', 'bgData', ['bubbleWords' => $words]);
-    }
-    elseif (is_page('about'))
+    } elseif (is_page('about')) {
         wp_enqueue_script('bg-about', get_template_directory_uri() . '/about.js', [], null, true);
-    elseif (is_page('contact'))
+    } elseif (is_page('contact')) {
         wp_enqueue_script('bg-contact', get_template_directory_uri() . '/contact.js', [], null, true);
-    elseif (is_page('work'))
+    } elseif (is_page('work') || is_singular('bg_project')) {
         wp_enqueue_script('bg-work', get_template_directory_uri() . '/work.js', [], null, true);
+    }
 });
 
 /* ── Custom post type: Project ───────────────────────────────────────────── */
@@ -106,6 +106,12 @@ function bg_contact($key, $default = '') {
     return esc_html(get_option($key, $default));
 }
 
+/* ── Helper: safe permalink for a page by slug ───────────────────────────── */
+function bg_page_url($slug) {
+    $page = get_page_by_path($slug);
+    return $page ? esc_url(get_permalink($page)) : esc_url(home_url('/' . $slug . '/'));
+}
+
 /* ── Admin: register settings ───────────────────────────────────────────── */
 add_action('admin_init', function () {
     $array_keys = ['bg_hero_slides', 'bg_slider_images', 'bg_about_photos'];
@@ -135,9 +141,10 @@ add_action('admin_menu', function () {
 /* ── Admin: enqueue media uploader + admin JS/CSS ───────────────────────── */
 add_action('admin_enqueue_scripts', function ($hook) {
     $on_settings = ($hook === 'toplevel_page_brushgunz');
-    $on_project  = in_array($hook, ['post.php', 'post-new.php']) &&
-                   (isset($_GET['post_type']) && $_GET['post_type'] === 'bg_project' ||
-                    isset($_GET['post']) && get_post_type(absint($_GET['post'])) === 'bg_project');
+    $post_type  = isset($_GET['post_type']) ? sanitize_key($_GET['post_type']) : '';
+    $post_id    = isset($_GET['post'])      ? absint($_GET['post'])            : 0;
+    $on_project = in_array($hook, ['post.php', 'post-new.php']) &&
+                  ($post_type === 'bg_project' || get_post_type($post_id) === 'bg_project');
 
     if (!$on_settings && !$on_project) return;
     wp_enqueue_media();

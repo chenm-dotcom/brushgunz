@@ -79,7 +79,7 @@
   </section>
 
   <div class="view-all-row">
-    <a href="<?php echo esc_url(get_permalink(get_page_by_path('work'))); ?>" class="view-all-btn">View All Work</a>
+    <a href="<?php echo bg_page_url('work'); ?>" class="view-all-btn">View All Work</a>
   </div>
 
 </main>
