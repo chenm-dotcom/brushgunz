@@ -901,3 +901,107 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
   .contact-links a { font-size: 40px; }
   .contact-footer { padding: 0 15px; }
 }
+
+/* ── Grid card link wrapper ─────────────────────────────────────────────── */
+.grid-card-link {
+  display: contents;
+  text-decoration: none;
+  color: inherit;
+}
+
+/* ── Single project page ────────────────────────────────────────────────── */
+.project-page {
+  display: grid;
+  grid-template-columns: 38% 62%;
+  min-height: 100vh;
+}
+
+.project-left {
+  position: sticky;
+  top: 50px;
+  height: calc(100vh - 50px);
+  overflow-y: auto;
+  padding: 60px 48px 60px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border-right: 1px solid rgba(0,0,0,.08);
+}
+
+.project-back {
+  font-family: 'PPEditorial', serif;
+  font-size: 13px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: #888;
+  text-decoration: none;
+  transition: color .2s;
+  flex-shrink: 0;
+}
+.project-back:hover { color: var(--blue); }
+
+.project-cat {
+  font-family: 'PPEditorial', serif;
+  font-size: 11px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--blue);
+}
+
+.project-title {
+  font-family: 'PPPalma', sans-serif;
+  font-size: clamp(32px, 4vw, 56px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -.02em;
+  color: var(--ink);
+  margin: 0;
+}
+
+.project-content {
+  font-family: 'PPEditorial', serif;
+  font-size: 17px;
+  line-height: 1.6;
+  color: #444;
+}
+.project-content p { margin: 0 0 1em; }
+
+.project-right {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px 6px 6px 6px;
+  background: #f5f4f2;
+}
+
+.project-img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  background-size: cover;
+  background-position: center center;
+  border-radius: 4px;
+}
+
+.project-img-empty {
+  padding: 60px 40px;
+  color: #888;
+  font-family: 'PPEditorial', serif;
+  font-size: 15px;
+}
+
+@media (max-width: 768px) {
+  .project-page {
+    grid-template-columns: 1fr;
+    min-height: unset;
+  }
+  .project-left {
+    position: static;
+    height: auto;
+    padding: 80px 20px 32px;
+    border-right: none;
+    border-bottom: 1px solid rgba(0,0,0,.08);
+  }
+  .project-right {
+    padding: 4px;
+  }
+}

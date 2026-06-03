@@ -73,9 +73,11 @@
           $thumb = get_the_post_thumbnail_url(null, 'large');
       ?>
         <li class="grid-card">
-          <span class="grid-card-cat"><?php echo $cat; ?></span>
-          <div class="grid-card-img"<?php if ($thumb) echo ' style="background-image:url(\'' . esc_url($thumb) . '\')"'; ?>></div>
-          <span class="grid-card-title"><?php the_title(); ?></span>
+          <a href="<?php the_permalink(); ?>" class="grid-card-link" aria-label="<?php the_title_attribute(); ?>">
+            <span class="grid-card-cat"><?php echo $cat; ?></span>
+            <div class="grid-card-img"<?php if ($thumb) echo ' style="background-image:url(\'' . esc_url($thumb) . '\')"'; ?>></div>
+            <span class="grid-card-title"><?php the_title(); ?></span>
+          </a>
         </li>
       <?php endwhile; wp_reset_postdata(); ?>
     </ul>

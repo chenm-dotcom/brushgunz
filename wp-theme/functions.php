@@ -31,17 +31,19 @@ add_action('init', function () {
             'edit_item'     => 'Edit Project',
             'all_items'     => 'All Projects',
         ],
-        'public'        => false,
-        'show_ui'       => true,
-        'show_in_menu'  => true,
-        'menu_icon'     => 'dashicons-portfolio',
-        'menu_position' => 5,
-        'supports'      => ['title', 'thumbnail', 'page-attributes'],
-        'rewrite'       => false,
+        'public'             => true,
+        'publicly_queryable' => true,
+        'show_ui'            => true,
+        'show_in_menu'       => true,
+        'menu_icon'          => 'dashicons-portfolio',
+        'menu_position'      => 5,
+        'supports'           => ['title', 'editor', 'thumbnail', 'page-attributes'],
+        'rewrite'            => ['slug' => 'project', 'with_front' => false],
+        'has_archive'        => false,
     ]);
 });
 
-/* ── Project meta box: category label ───────────────────────────────────── */
+/* ── Project meta boxes: category label + gallery images ─────────────────── */
 add_action('add_meta_boxes', function () {
     add_meta_box('bg_cat_box', 'Category Label', function ($post) {
         wp_nonce_field('bg_save_project', 'bg_nonce');
@@ -49,6 +51,18 @@ add_action('add_meta_boxes', function () {
         echo '<input type="text" name="bg_cat" value="' . $val . '" placeholder="e.g. Photography" style="width:100%">';
         echo '<p class="description">Shown above the project title on the grid card.</p>';
     }, 'bg_project');
+
+    add_meta_box('bg_gallery_box', 'Project Gallery Images', function ($post) {
+        $ids = get_post_meta($post->ID, '_bg_gallery', true);
+        if (!is_array($ids)) $ids = [];
+        ?>
+        <p class="description" style="margin-bottom:12px">Images shown on the project detail page (right-side scroll). Add as many as you like.</p>
+        <div class="bg-list" id="bg-gallery-list" data-name="bg_gallery">
+            <?php foreach ($ids as $id) bg_admin_row('bg_gallery', $id); ?>
+        </div>
+        <button type="button" class="button button-secondary bg-add-btn" data-list="bg-gallery-list" data-name="bg_gallery">+ Add Image</button>
+        <?php
+    }, 'bg_project', 'normal', 'default');
 });
 
 add_action('save_post_bg_project', function ($id) {
@@ -56,6 +70,9 @@ add_action('save_post_bg_project', function ($id) {
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
     if (isset($_POST['bg_cat']))
         update_post_meta($id, '_bg_cat', sanitize_text_field($_POST['bg_cat']));
+    $gallery = isset($_POST['bg_gallery']) ? $_POST['bg_gallery'] : [];
+    $gallery = array_values(array_filter(array_map('absint', (array) $gallery)));
+    update_post_meta($id, '_bg_gallery', $gallery);
 });
 
 /* ── Helper: get stored array of attachment IDs ──────────────────────────── */
@@ -107,7 +124,12 @@ add_action('admin_menu', function () {
 
 /* ── Admin: enqueue media uploader + admin JS/CSS ───────────────────────── */
 add_action('admin_enqueue_scripts', function ($hook) {
-    if ($hook !== 'toplevel_page_brushgunz') return;
+    $on_settings = ($hook === 'toplevel_page_brushgunz');
+    $on_project  = in_array($hook, ['post.php', 'post-new.php']) &&
+                   (isset($_GET['post_type']) && $_GET['post_type'] === 'bg_project' ||
+                    isset($_GET['post']) && get_post_type(absint($_GET['post'])) === 'bg_project');
+
+    if (!$on_settings && !$on_project) return;
     wp_enqueue_media();
     wp_enqueue_script('bg-admin', get_template_directory_uri() . '/admin/options.js', ['jquery'], null, true);
     wp_add_inline_style('wp-admin', bg_admin_css());

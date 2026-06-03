@@ -21,8 +21,25 @@
 
   <!-- BIO ------------------------------------------------------------------ -->
   <section class="bio-section">
-    <p class="bio-black">Brushgunz is Chen Mizrach who is a Creative Director &amp; photographer.</p>
-    <p class="bio-blue">I create vision and clarity for brands. Help them create the content they didn't know they need. All with a playful and creative attitude.</p>
+    <?php
+    $blocks = parse_blocks(get_post_field('post_content', get_the_ID()));
+    $p_idx  = 0;
+    foreach ($blocks as $block):
+        if ($block['blockName'] !== 'core/paragraph') continue;
+        $cls = $p_idx === 0 ? 'bio-black' : 'bio-blue';
+        $p_idx++;
+        $text = wp_kses_post($block['innerHTML']);
+        // strip the block's own <p> tags so we control the element
+        $inner = preg_replace('#^<p[^>]*>|</p>$#i', '', trim($text));
+        echo '<p class="' . $cls . '">' . $inner . '</p>';
+    endforeach;
+
+    // fallback defaults if editor is empty
+    if ($p_idx === 0):
+    ?>
+      <p class="bio-black">Brushgunz is Chen Mizrach who is a Creative Director &amp; photographer.</p>
+      <p class="bio-blue">I create vision and clarity for brands. Help them create the content they didn't know they need. All with a playful and creative attitude.</p>
+    <?php endif; ?>
   </section>
 
   <!-- FOOTER --------------------------------------------------------------- -->
