@@ -264,7 +264,7 @@ function bg_settings_page() {
                     <?php for ($i = 0; $i < 4; $i++): ?>
                         <div class="bg-about-cell">
                             <strong><?php echo $labels[$i]; ?></strong>
-                            <?php bg_admin_row('bg_about_photos[' . $i . ']', $cells[$i]); ?>
+                            <?php bg_admin_row('bg_about_photos[' . $i . ']', $cells[$i], true); ?>
                         </div>
                     <?php endfor; ?>
                 </div>
@@ -347,13 +347,14 @@ function bg_settings_page() {
 }
 
 /* ── Admin: render one media row ─────────────────────────────────────────── */
-function bg_admin_row($name, $id = 0) {
+function bg_admin_row($name, $id = 0, $single = false) {
     $url   = $id ? wp_get_attachment_image_url($id, 'medium') : '';
     $mime  = $id ? get_post_mime_type($id) : '';
     $video = $mime && strpos($mime, 'video') !== false;
+    $field_name = $single ? $name : $name . '[]';
     ?>
     <div class="bg-row">
-        <input type="hidden" name="<?php echo esc_attr($name); ?>[]" class="bg-id" value="<?php echo (int) $id; ?>">
+        <input type="hidden" name="<?php echo esc_attr($field_name); ?>" class="bg-id" value="<?php echo (int) $id; ?>">
         <div class="bg-preview">
             <?php if ($id && !$video && $url): ?>
                 <img src="<?php echo esc_url($url); ?>" alt="">

@@ -547,12 +547,12 @@ footer {
   flex-shrink: 0;
 }
 .footer-pic {
-  width: 90px;
-  height: 90px;
-  border-radius: 4px;
+  width: 110px;
+  height: 110px;
+  border-radius: 8px;
   background: rgba(255,255,255,.22);
   background-size: cover;
-  background-position: center center;
+  background-position: center top;
   flex-shrink: 0;
 }
 .footer-desc {
@@ -917,6 +917,7 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
   display: grid;
   grid-template-columns: 38% 62%;
   min-height: 100vh;
+  padding-top: 50px;
 }
 
 .project-left {
