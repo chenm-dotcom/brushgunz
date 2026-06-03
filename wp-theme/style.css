@@ -737,6 +737,20 @@ footer {
 nav#mainNav.nav-light .nav-links a { color: var(--ink); }
 nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
 
+/* ── WP admin bar offset — push our fixed nav below it when logged in ─────── */
+@media screen and (min-width: 601px) {
+  .admin-bar nav#mainNav { top: 32px; }
+  .admin-bar .project-page { padding-top: 82px; }
+  .admin-bar .page { padding-top: 82px; }
+  .admin-bar .mob-menu-btn { top: 52px; }
+}
+@media screen and (max-width: 600px) {
+  .admin-bar nav#mainNav { top: 46px; }
+  .admin-bar .project-page { padding-top: 96px; }
+  .admin-bar .page { padding-top: 96px; }
+  .admin-bar .mob-menu-btn { top: 66px; }
+}
+
 /* ── About page ------------------------------------------------------------- */
 .about-header {
   padding: 60px 0 0;
@@ -950,6 +964,8 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
   letter-spacing: .16em;
   text-transform: uppercase;
   color: var(--blue);
+  display: inline-block;
+  margin-right: 10px;
 }
 
 .project-title {
@@ -997,15 +1013,19 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
   .project-page {
     grid-template-columns: 1fr;
     min-height: unset;
+    padding-top: 50px;
   }
   .project-left {
     position: static;
     height: auto;
-    padding: 60px 20px 32px;
+    padding: 24px 20px 32px;
     border-right: none;
     border-bottom: 1px solid rgba(0,0,0,.08);
   }
   .project-right {
     padding: 4px;
+  }
+  .project-img {
+    aspect-ratio: 3 / 2;
   }
 }

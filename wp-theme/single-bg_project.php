@@ -5,7 +5,15 @@
   <!-- LEFT: sticky info panel -->
   <div class="project-left">
     <a href="<?php echo bg_page_url('work'); ?>" class="project-back">← All Work</a>
-    <span class="project-cat"><?php echo esc_html(get_post_meta(get_the_ID(), '_bg_cat', true)); ?></span>
+    <?php
+    $cats = get_post_meta(get_the_ID(), '_bg_cats', true);
+    if (!is_array($cats) || empty($cats)) {
+        $old = get_post_meta(get_the_ID(), '_bg_cat', true);
+        $cats = $old ? [$old] : [];
+    }
+    if ($cats): foreach ($cats as $cat): ?>
+      <span class="project-cat"><?php echo esc_html($cat); ?></span>
+    <?php endforeach; endif; ?>
     <h1 class="project-title"><?php the_title(); ?></h1>
     <?php if (get_the_content()): ?>
       <div class="project-content"><?php the_content(); ?></div>

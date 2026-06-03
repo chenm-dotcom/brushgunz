@@ -54,20 +54,58 @@ add_action('init', function () {
     ]);
 });
 
-/* ── Project meta boxes: category label + gallery images ─────────────────── */
+/* ── Project meta boxes ──────────────────────────────────────────────────── */
 add_action('add_meta_boxes', function () {
-    add_meta_box('bg_cat_box', 'Category Label', function ($post) {
-        wp_nonce_field('bg_save_project', 'bg_nonce');
-        $val = esc_attr(get_post_meta($post->ID, '_bg_cat', true));
-        echo '<input type="text" name="bg_cat" value="' . $val . '" placeholder="e.g. Photography" style="width:100%">';
-        echo '<p class="description">Shown above the project title on the grid card.</p>';
-    }, 'bg_project');
 
-    add_meta_box('bg_gallery_box', 'Project Gallery Images', function ($post) {
+    /* HOW THIS PAGE WORKS — top info box */
+    add_meta_box('bg_how_box', '📋 How the Project Page Works', function ($post) {
+        echo '
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;font-family:sans-serif;font-size:13px">
+          <div style="background:#f0f4ff;border-radius:6px;padding:14px">
+            <strong style="display:block;margin-bottom:8px;color:#1a4aff">LEFT PANEL — Sticky text</strong>
+            <ul style="margin:0;padding-left:16px;line-height:1.8">
+              <li><b>Title field</b> (top of this page) → project name</li>
+              <li><b>Categories</b> → tags shown below the title</li>
+              <li><b>Description</b> → text editor below the title</li>
+            </ul>
+          </div>
+          <div style="background:#f0f4ff;border-radius:6px;padding:14px">
+            <strong style="display:block;margin-bottom:8px;color:#1a4aff">RIGHT PANEL — Scrolling images</strong>
+            <ul style="margin:0;padding-left:16px;line-height:1.8">
+              <li><b>Featured Image</b> → first image shown</li>
+              <li><b>Gallery Images</b> → all images that scroll</li>
+            </ul>
+          </div>
+        </div>';
+    }, 'bg_project', 'normal', 'high');
+
+    /* CATEGORIES — up to 5 */
+    add_meta_box('bg_cat_box', 'Categories (up to 5)', function ($post) {
+        wp_nonce_field('bg_save_project', 'bg_nonce');
+        $cats = get_post_meta($post->ID, '_bg_cats', true);
+        if (!is_array($cats) || empty($cats)) {
+            $old = get_post_meta($post->ID, '_bg_cat', true);
+            $cats = $old ? [$old] : [];
+        }
+        while (count($cats) < 5) $cats[] = '';
+        echo '<p class="description" style="margin-bottom:10px">Each filled tag appears on the project page and work grid. Leave extras blank.</p>';
+        echo '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+        for ($i = 0; $i < 5; $i++) {
+            $v = esc_attr($cats[$i]);
+            echo '<input type="text" name="bg_cats[]" value="' . $v . '" placeholder="Category ' . ($i + 1) . '" style="width:160px">';
+        }
+        echo '</div>';
+    }, 'bg_project', 'normal', 'high');
+
+    /* GALLERY IMAGES */
+    add_meta_box('bg_gallery_box', 'Gallery Images → Right scrolling panel', function ($post) {
         $ids = get_post_meta($post->ID, '_bg_gallery', true);
         if (!is_array($ids)) $ids = [];
         ?>
-        <p class="description" style="margin-bottom:12px">Images shown on the project detail page (right-side scroll). Add as many as you like.</p>
+        <p class="description" style="margin-bottom:12px">
+            These images fill the right side of the project page and scroll as the visitor reads.<br>
+            <strong>Tip:</strong> also set a <em>Featured Image</em> (bottom-right of this page) — it appears first in the gallery and as the thumbnail on the Work grid.
+        </p>
         <div class="bg-list" id="bg-gallery-list" data-name="bg_gallery">
             <?php foreach ($ids as $id) bg_admin_row('bg_gallery', $id); ?>
         </div>
@@ -79,8 +117,9 @@ add_action('add_meta_boxes', function () {
 add_action('save_post_bg_project', function ($id) {
     if (!isset($_POST['bg_nonce']) || !wp_verify_nonce($_POST['bg_nonce'], 'bg_save_project')) return;
     if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return;
-    if (isset($_POST['bg_cat']))
-        update_post_meta($id, '_bg_cat', sanitize_text_field($_POST['bg_cat']));
+    $cats = isset($_POST['bg_cats']) ? array_values(array_filter(array_map('sanitize_text_field', (array)$_POST['bg_cats']))) : [];
+    update_post_meta($id, '_bg_cats', $cats);
+    update_post_meta($id, '_bg_cat', isset($cats[0]) ? $cats[0] : '');
     $gallery = isset($_POST['bg_gallery']) ? $_POST['bg_gallery'] : [];
     $gallery = array_values(array_filter(array_map('absint', (array) $gallery)));
     update_post_meta($id, '_bg_gallery', $gallery);
