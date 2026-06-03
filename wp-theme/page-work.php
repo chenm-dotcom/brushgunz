@@ -43,7 +43,7 @@
     <div class="footer-top">
       <div class="footer-hey">Hey.</div>
       <div class="footer-pic" role="img" aria-label="Chen Mizrach photo"<?php if ($profile_url) echo ' style="background-image:url(\'' . esc_url($profile_url) . '\')"'; ?>></div>
-      <p class="footer-desc">If this website got you interested in something and you work on some kind of a lifestyle product, don't hesitate to call or contact.</p>
+      <p class="footer-desc">If this website got you interested in something<br>and you work on some kind of a lifestyle product,<br>don't hesitate to call or contact.</p>
     </div>
     <hr class="footer-divider">
     <div class="footer-links">
