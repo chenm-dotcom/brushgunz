@@ -834,7 +834,9 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
 
 @media (max-width: 768px) {
   .about-header { padding: 40px 0 0; }
-  .bio-section  { padding: 28px 15px 48px; }
+  .bio-section  { padding: 28px 15px 48px; width: 100%; }
+  .bio-black, .bio-blue { font-size: clamp(28px, 7vw, 44px); }
+  .photo-grid   { grid-template-columns: 1fr; }
 }
 
 /* ── Contact page ----------------------------------------------------------- */
@@ -898,7 +900,7 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
 
 @media (max-width: 768px) {
   .contact-body  { padding: 56px 15px 40px; }
-  .contact-intro { font-size: 18px; margin-bottom: 44px; }
+  .contact-intro { font-size: 18px; margin-bottom: 44px; max-width: 100%; }
   .contact-links a { font-size: 40px; }
   .contact-footer { padding: 0 15px; }
 }
@@ -998,7 +1000,7 @@ nav#mainNav.nav-light.scrolled .nav-links a { color: var(--ink); }
   .project-left {
     position: static;
     height: auto;
-    padding: 80px 20px 32px;
+    padding: 60px 20px 32px;
     border-right: none;
     border-bottom: 1px solid rgba(0,0,0,.08);
   }

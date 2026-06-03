@@ -1,12 +1,15 @@
 /* ── Nav scroll ─────────────────────────────────────────────────────────── */
 const mainNav = document.getElementById('mainNav');
-window.addEventListener('scroll', () => {
-  mainNav.classList.toggle('scrolled', window.scrollY > 20);
-}, { passive: true });
+if (mainNav) {
+  window.addEventListener('scroll', () => {
+    mainNav.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
+}
 
 /* ── Fit hero title to viewport ─────────────────────────────────────────── */
 function fitTitle() {
   const title = document.getElementById('heroTitle');
+  if (!title) return;
   title.style.fontSize = '200px';
   const ratio = window.innerWidth / title.offsetWidth;
   title.style.fontSize = Math.floor(200 * ratio) + 'px';
@@ -37,18 +40,22 @@ function startHeroTimer() {
 startHeroTimer();
 
 const heroEl = document.getElementById('hero');
-heroEl.addEventListener('mouseenter', () => clearInterval(heroTimer));
-heroEl.addEventListener('mouseleave', startHeroTimer);
+if (heroEl) {
+  heroEl.addEventListener('mouseenter', () => clearInterval(heroTimer));
+  heroEl.addEventListener('mouseleave', startHeroTimer);
+}
 
 /* ── Expand bio ─────────────────────────────────────────────────────────── */
 const expandBtn  = document.getElementById('expandBtn');
 const introExtra = document.getElementById('introExtra');
 
-expandBtn.addEventListener('click', () => {
-  const isOpen = introExtra.classList.toggle('open');
-  expandBtn.classList.toggle('open', isOpen);
-  expandBtn.setAttribute('aria-expanded', isOpen);
-});
+if (expandBtn && introExtra) {
+  expandBtn.addEventListener('click', () => {
+    const isOpen = introExtra.classList.toggle('open');
+    expandBtn.classList.toggle('open', isOpen);
+    expandBtn.setAttribute('aria-expanded', isOpen);
+  });
+}
 
 /* ── Image slider ───────────────────────────────────────────────────────── */
 const imgSlides = Array.from(document.querySelectorAll('.img-slide'));
@@ -70,16 +77,10 @@ function startSlideTimer() {
 
 startSlideTimer();
 
-document.getElementById('slideNext').addEventListener('click', () => {
-  clearInterval(imgTimer);
-  goSlide(imgIdx + 1);
-  startSlideTimer();
-});
-document.getElementById('slidePrev').addEventListener('click', () => {
-  clearInterval(imgTimer);
-  goSlide(imgIdx - 1);
-  startSlideTimer();
-});
+const slideNext = document.getElementById('slideNext');
+const slidePrev = document.getElementById('slidePrev');
+if (slideNext) slideNext.addEventListener('click', () => { clearInterval(imgTimer); goSlide(imgIdx + 1); startSlideTimer(); });
+if (slidePrev) slidePrev.addEventListener('click', () => { clearInterval(imgTimer); goSlide(imgIdx - 1); startSlideTimer(); });
 
 /* ── Floating hero bubbles ──────────────────────────────────────────────── */
 (function () {
@@ -179,27 +180,27 @@ document.getElementById('slidePrev').addEventListener('click', () => {
 const mobBtn     = document.getElementById('mobMenuBtn');
 const mobOverlay = document.getElementById('mobOverlay');
 
-function openMob() {
-  mobOverlay.style.display = 'flex';
-  requestAnimationFrame(() => mobOverlay.classList.add('open'));
-  mobBtn.classList.add('hidden');
-  document.body.style.overflow = 'hidden';
+if (mobBtn && mobOverlay) {
+  function openMob() {
+    mobOverlay.style.display = 'flex';
+    requestAnimationFrame(() => mobOverlay.classList.add('open'));
+    mobBtn.classList.add('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMob() {
+    mobOverlay.classList.remove('open');
+    setTimeout(() => { mobOverlay.style.display = 'none'; }, 300);
+    mobBtn.classList.remove('hidden');
+    document.body.style.overflow = '';
+  }
+
+  mobBtn.addEventListener('click', openMob);
+  const mobClose = document.getElementById('mobClose');
+  if (mobClose) mobClose.addEventListener('click', closeMob);
+  document.querySelectorAll('.mob-overlay a').forEach(link => link.addEventListener('click', closeMob));
+
+  window.addEventListener('scroll', () => {
+    mobBtn.classList.toggle('scrolled', window.scrollY > 20);
+  }, { passive: true });
 }
-
-function closeMob() {
-  mobOverlay.classList.remove('open');
-  setTimeout(() => { mobOverlay.style.display = 'none'; }, 300);
-  mobBtn.classList.remove('hidden');
-  document.body.style.overflow = '';
-}
-
-mobBtn.addEventListener('click', openMob);
-document.getElementById('mobClose').addEventListener('click', closeMob);
-
-document.querySelectorAll('.mob-overlay a').forEach(link => {
-  link.addEventListener('click', closeMob);
-});
-
-window.addEventListener('scroll', () => {
-  mobBtn.classList.toggle('scrolled', window.scrollY > 20);
-}, { passive: true });
