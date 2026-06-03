@@ -84,7 +84,9 @@ document.getElementById('slidePrev').addEventListener('click', () => {
 /* ── Floating hero bubbles ──────────────────────────────────────────────── */
 (function () {
   const hero   = document.getElementById('hero');
-  const words  = ['Creative', 'AI', 'Design', 'Social', 'Content', 'Photography'];
+  const words  = (typeof bgData !== 'undefined' && bgData.bubbleWords.length)
+    ? bgData.bubbleWords
+    : ['Creative', 'AI', 'Design', 'Social', 'Content', 'Photography'];
   const colors = ['#1a4aff', '#e8251a', '#1a1020', '#e8251a', '#1a4aff', '#1a1020'];
 
   function spawnBubble() {
@@ -94,7 +96,19 @@ document.getElementById('slidePrev').addEventListener('click', () => {
     const col  = colors[Math.floor(Math.random() * colors.length)];
     const word = words[Math.floor(Math.random() * words.length)];
 
-    const s = 85;
+    // Measure content size so bubble always fits its text with padding
+    Object.assign(el.style, {
+      background: col,
+      position: 'absolute',
+      visibility: 'hidden',
+      left: '-9999px', top: '-9999px',
+    });
+    el.innerHTML = `<span>${word}</span>`;
+    hero.appendChild(el);
+    const measured = el.querySelector('span').getBoundingClientRect();
+    const pad = 24;
+    const s   = Math.max(measured.width + pad * 2, measured.height + pad * 2);
+    hero.removeChild(el);
 
     const startX     = 4 + Math.random() * 88;
     const startY     = hero.offsetHeight * (0.2 + Math.random() * 0.7);
@@ -108,6 +122,7 @@ document.getElementById('slidePrev').addEventListener('click', () => {
       background: col,
       position: 'absolute',
       left: `${startX}%`, top: `${startY}px`,
+      visibility: '',
       borderRadius: '50%', opacity: '0',
       transformOrigin: 'center center',
     });

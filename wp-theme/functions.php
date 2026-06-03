@@ -10,8 +10,12 @@ add_action('after_setup_theme', function () {
 add_action('wp_enqueue_scripts', function () {
     wp_enqueue_style('brushgunz', get_stylesheet_uri(), [], '1.0');
 
-    if (is_front_page())
+    if (is_front_page()) {
         wp_enqueue_script('bg-main', get_template_directory_uri() . '/main.js', [], null, true);
+        $raw   = get_option('bg_bubble_words', "Creative\nAI\nDesign\nSocial\nContent\nPhotography");
+        $words = array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", '', $raw)))));
+        wp_localize_script('bg-main', 'bgData', ['bubbleWords' => $words]);
+    }
     elseif (is_page('about'))
         wp_enqueue_script('bg-about', get_template_directory_uri() . '/about.js', [], null, true);
     elseif (is_page('contact'))
@@ -116,6 +120,11 @@ add_action('admin_init', function () {
     register_setting('bg_options', 'bg_contact_email',      ['sanitize_callback' => 'sanitize_email']);
     register_setting('bg_options', 'bg_contact_instagram',  ['sanitize_callback' => 'sanitize_text_field']);
     register_setting('bg_options', 'bg_ticker_text',        ['sanitize_callback' => 'sanitize_text_field']);
+    register_setting('bg_options', 'bg_bubble_words',       ['sanitize_callback' => function ($v) {
+        $lines = explode("\n", str_replace("\r", '', (string) $v));
+        $lines = array_values(array_filter(array_map('sanitize_text_field', $lines)));
+        return implode("\n", $lines);
+    }]);
 });
 
 /* ── Admin: menu page ───────────────────────────────────────────────────── */
@@ -157,7 +166,7 @@ function bg_admin_css() {
 /* ── Admin: settings page HTML ──────────────────────────────────────────── */
 function bg_settings_page() {
     $tab  = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'hero';
-    $tabs = ['hero' => 'Hero Slides', 'slider' => 'Image Slider', 'about' => 'About Photos', 'ticker' => 'Ticker', 'contact' => 'Contact Info'];
+    $tabs = ['hero' => 'Hero Slides', 'slider' => 'Image Slider', 'about' => 'About Photos', 'ticker' => 'Ticker', 'bubbles' => 'Bubbles', 'contact' => 'Contact Info'];
     ?>
     <div class="wrap bg-admin">
         <h1>Brushgunz Media Manager</h1>
@@ -219,6 +228,19 @@ function bg_settings_page() {
                 <?php if ($pid): ?>
                     <button type="button" class="button bg-remove-single" style="margin-left:8px">Remove</button>
                 <?php endif; ?>
+
+            <?php elseif ($tab === 'bubbles'): ?>
+                <h2>Hero Bubbles</h2>
+                <p>Words or short phrases that float up in the hero. One per line — bubbles always resize to fit the text.</p>
+                <table class="form-table">
+                    <tr>
+                        <th scope="row"><label for="bg_bubble_words">Words / phrases</label></th>
+                        <td>
+                            <textarea id="bg_bubble_words" name="bg_bubble_words" rows="10" class="large-text"><?php echo esc_textarea(get_option('bg_bubble_words', "Creative\nAI\nDesign\nSocial\nContent\nPhotography")); ?></textarea>
+                            <p class="description">Each line becomes one bubble. Keep phrases short — they float inside the hero image area.</p>
+                        </td>
+                    </tr>
+                </table>
 
             <?php elseif ($tab === 'ticker'): ?>
                 <h2>Ticker Text</h2>
