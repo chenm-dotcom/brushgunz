@@ -6,6 +6,11 @@ add_action('after_setup_theme', function () {
     add_theme_support('html5', ['script', 'style']);
 });
 
+/* ── Flush rewrite rules once after theme switch so project URLs work ─────── */
+add_action('after_switch_theme', function () {
+    flush_rewrite_rules();
+});
+
 /* ── Enqueue styles + page-specific scripts ──────────────────────────────── */
 add_action('wp_enqueue_scripts', function () {
     $dir = get_template_directory();
