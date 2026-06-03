@@ -8,19 +8,21 @@ add_action('after_setup_theme', function () {
 
 /* ── Enqueue styles + page-specific scripts ──────────────────────────────── */
 add_action('wp_enqueue_scripts', function () {
-    wp_enqueue_style('brushgunz', get_stylesheet_uri(), [], '1.0');
+    $dir = get_template_directory();
+    $uri = get_template_directory_uri();
+    wp_enqueue_style('brushgunz', get_stylesheet_uri(), [], filemtime($dir . '/style.css'));
 
     if (is_front_page()) {
-        wp_enqueue_script('bg-main', get_template_directory_uri() . '/main.js', [], null, true);
+        wp_enqueue_script('bg-main', $uri . '/main.js', [], filemtime($dir . '/main.js'), true);
         $raw   = get_option('bg_bubble_words', "Creative\nAI\nDesign\nSocial\nContent\nPhotography");
         $words = array_values(array_filter(array_map('trim', explode("\n", str_replace("\r", '', $raw)))));
         wp_localize_script('bg-main', 'bgData', ['bubbleWords' => $words]);
     } elseif (is_page('about')) {
-        wp_enqueue_script('bg-about', get_template_directory_uri() . '/about.js', [], null, true);
+        wp_enqueue_script('bg-about', $uri . '/about.js', [], filemtime($dir . '/about.js'), true);
     } elseif (is_page('contact')) {
-        wp_enqueue_script('bg-contact', get_template_directory_uri() . '/contact.js', [], null, true);
+        wp_enqueue_script('bg-contact', $uri . '/contact.js', [], filemtime($dir . '/contact.js'), true);
     } elseif (is_page('work') || is_singular('bg_project')) {
-        wp_enqueue_script('bg-work', get_template_directory_uri() . '/work.js', [], null, true);
+        wp_enqueue_script('bg-work', $uri . '/work.js', [], filemtime($dir . '/work.js'), true);
     }
 });
 

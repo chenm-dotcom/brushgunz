@@ -85,6 +85,7 @@ if (slidePrev) slidePrev.addEventListener('click', () => { clearInterval(imgTime
 /* ── Floating hero bubbles ──────────────────────────────────────────────── */
 (function () {
   const hero   = document.getElementById('hero');
+  if (!hero) return;
   const words  = (typeof bgData !== 'undefined' && bgData.bubbleWords.length)
     ? bgData.bubbleWords
     : ['Creative', 'AI', 'Design', 'Social', 'Content', 'Photography'];
