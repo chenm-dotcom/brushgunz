@@ -563,6 +563,8 @@ footer {
   color: rgba(255,255,255,.8);
   flex-basis: 100%;
 }
+.desk-br { display: inline; }
+.desk-br br { display: inline; }
 .footer-divider { display: none; }
 .footer-links {
   display: flex;
@@ -721,6 +723,7 @@ footer {
   .footer-hey { font-size: 22vw; line-height: .85; }
   .footer-pic { width: 70px; height: 70px; }
   .footer-desc { font-size: 22px; line-height: 1.3; flex-basis: 100%; margin-top: 12px; }
+  .desk-br, .desk-br br { display: none; }
   .footer-links { padding: 32px 0 40px; gap: 4px; overflow: hidden; }
   .footer-links a { font-size: clamp(24px, 8vw, 44px); line-height: 1.15; overflow-wrap: anywhere; }
   .footer-bar { flex-direction: column; gap: 4px; padding: 16px 0 0; }

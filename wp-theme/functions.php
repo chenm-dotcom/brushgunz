@@ -112,25 +112,26 @@ function bg_page_url($slug) {
     return $page ? esc_url(get_permalink($page)) : esc_url(home_url('/' . $slug . '/'));
 }
 
-/* ── Admin: register settings ───────────────────────────────────────────── */
+/* ── Admin: register settings — one group per tab so saves are isolated ──── */
 add_action('admin_init', function () {
-    $array_keys = ['bg_hero_slides', 'bg_slider_images', 'bg_about_photos'];
-    foreach ($array_keys as $k)
-        register_setting('bg_options', $k, ['sanitize_callback' => function ($v) {
-            if (!is_array($v)) return [];
-            return array_values(array_filter(array_map('absint', $v)));
-        }]);
-
-    register_setting('bg_options', 'bg_profile_pic',        ['sanitize_callback' => 'absint']);
-    register_setting('bg_options', 'bg_contact_phone',      ['sanitize_callback' => 'sanitize_text_field']);
-    register_setting('bg_options', 'bg_contact_email',      ['sanitize_callback' => 'sanitize_email']);
-    register_setting('bg_options', 'bg_contact_instagram',  ['sanitize_callback' => 'sanitize_text_field']);
-    register_setting('bg_options', 'bg_ticker_text',        ['sanitize_callback' => 'sanitize_text_field']);
-    register_setting('bg_options', 'bg_bubble_words',       ['sanitize_callback' => function ($v) {
+    $arr_cb = function ($v) {
+        if (!is_array($v)) return [];
+        return array_values(array_filter(array_map('absint', $v)));
+    };
+    $bubble_cb = function ($v) {
         $lines = explode("\n", str_replace("\r", '', (string) $v));
-        $lines = array_values(array_filter(array_map('sanitize_text_field', $lines)));
-        return implode("\n", $lines);
-    }]);
+        return implode("\n", array_values(array_filter(array_map('sanitize_text_field', $lines))));
+    };
+
+    register_setting('bg_hero_options',    'bg_hero_slides',       ['sanitize_callback' => $arr_cb]);
+    register_setting('bg_slider_options',  'bg_slider_images',     ['sanitize_callback' => $arr_cb]);
+    register_setting('bg_about_options',   'bg_about_photos',      ['sanitize_callback' => $arr_cb]);
+    register_setting('bg_about_options',   'bg_profile_pic',       ['sanitize_callback' => 'absint']);
+    register_setting('bg_ticker_options',  'bg_ticker_text',       ['sanitize_callback' => 'sanitize_text_field']);
+    register_setting('bg_bubbles_options', 'bg_bubble_words',      ['sanitize_callback' => $bubble_cb]);
+    register_setting('bg_contact_options', 'bg_contact_phone',     ['sanitize_callback' => 'sanitize_text_field']);
+    register_setting('bg_contact_options', 'bg_contact_email',     ['sanitize_callback' => 'sanitize_email']);
+    register_setting('bg_contact_options', 'bg_contact_instagram', ['sanitize_callback' => 'sanitize_text_field']);
 });
 
 /* ── Admin: menu page ───────────────────────────────────────────────────── */
@@ -186,8 +187,20 @@ function bg_settings_page() {
             <?php endforeach; ?>
         </nav>
 
+        <?php
+        // Map each tab to its own settings group
+        $tab_groups = [
+            'hero'    => 'bg_hero_options',
+            'slider'  => 'bg_slider_options',
+            'about'   => 'bg_about_options',
+            'ticker'  => 'bg_ticker_options',
+            'bubbles' => 'bg_bubbles_options',
+            'contact' => 'bg_contact_options',
+        ];
+        $current_group = $tab_groups[$tab] ?? 'bg_hero_options';
+        ?>
         <form method="post" action="options.php" class="bg-form" style="padding-top:24px">
-            <?php settings_fields('bg_options'); ?>
+            <?php settings_fields($current_group); ?>
 
             <?php if ($tab === 'hero'): ?>
                 <h2>Hero Slides</h2>
@@ -209,7 +222,7 @@ function bg_settings_page() {
                 <h2>About Photos</h2>
                 <p>The 2×2 photo grid on the about page. Upload one image per cell.</p>
                 <?php
-                $cells = array_pad(bg_ids('bg_about_photos'), 4, 0);
+                $cells  = array_pad(bg_ids('bg_about_photos'), 4, 0);
                 $labels = ['Top Left', 'Top Right', 'Bottom Left', 'Bottom Right'];
                 ?>
                 <div class="bg-about-grid">
