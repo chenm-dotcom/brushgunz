@@ -10,7 +10,7 @@
   </div>
 
   <!-- 2×2 PHOTO GRID ------------------------------------------------------- -->
-  <?php $cells = array_pad(bg_ids('bg_about_photos'), 4, 0); ?>
+  <?php $cells = bg_about_cells(); ?>
   <div class="photo-grid" aria-hidden="true">
     <?php foreach (['c1','c2','c3','c4'] as $i => $cls):
       $url = $cells[$i] ? wp_get_attachment_image_url($cells[$i], 'large') : '';

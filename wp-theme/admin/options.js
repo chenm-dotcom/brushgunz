@@ -68,4 +68,39 @@
         $(this).hide();
     });
 
+    /* ── AJAX form save — bypasses options.php entirely ─────────────────── */
+    $(document).on('submit', '.bg-form', function (e) {
+        e.preventDefault();
+
+        var $form   = $(this);
+        var $btn    = $form.find('.button-primary, [type="submit"]').first();
+        var $notice = $('#bg-save-notice');
+
+        $btn.prop('disabled', true).val('Saving…');
+        $notice.hide();
+
+        var data = $form.serializeArray();
+        data.push({ name: 'action', value: 'bg_save' });
+        data.push({ name: 'nonce',  value: bgAdmin.nonce });
+        data.push({ name: 'tab',    value: bgAdmin.tab });
+
+        $.post(bgAdmin.ajax, data)
+            .done(function (res) {
+                $btn.prop('disabled', false).val('Save Changes');
+                if (res.success) {
+                    $notice.removeClass('notice-error').addClass('notice-success')
+                           .html('<p>Settings saved.</p>').show();
+                } else {
+                    $notice.removeClass('notice-success').addClass('notice-error')
+                           .html('<p>Error: ' + (res.data || 'Save failed') + '</p>').show();
+                }
+                setTimeout(function () { $notice.fadeOut(); }, 3000);
+            })
+            .fail(function () {
+                $btn.prop('disabled', false).val('Save Changes');
+                $notice.removeClass('notice-success').addClass('notice-error')
+                       .html('<p>Network error — please try again.</p>').show();
+            });
+    });
+
 })(jQuery);

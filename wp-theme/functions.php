@@ -86,6 +86,15 @@ function bg_ids($key) {
     return array_values(array_filter(array_map('absint', $v)));
 }
 
+/* ── Helper: get 4-cell about photos (preserves positions, including 0) ──── */
+function bg_about_cells() {
+    $v = get_option('bg_about_photos', []);
+    if (!is_array($v)) $v = [];
+    $cells = [];
+    for ($i = 0; $i < 4; $i++) $cells[] = absint($v[$i] ?? 0);
+    return $cells;
+}
+
 /* ── Helper: render one media slot (image or video) ─────────────────────── */
 function bg_slide_html($id, $class = '') {
     if (!$id) return;
@@ -112,26 +121,56 @@ function bg_page_url($slug) {
     return $page ? esc_url(get_permalink($page)) : esc_url(home_url('/' . $slug . '/'));
 }
 
-/* ── Admin: register settings — one group per tab so saves are isolated ──── */
-add_action('admin_init', function () {
-    $arr_cb = function ($v) {
-        if (!is_array($v)) return [];
-        return array_values(array_filter(array_map('absint', $v)));
-    };
-    $bubble_cb = function ($v) {
-        $lines = explode("\n", str_replace("\r", '', (string) $v));
-        return implode("\n", array_values(array_filter(array_map('sanitize_text_field', $lines))));
-    };
+/* ── Admin: AJAX save handler — bypasses options.php entirely ────────────── */
+add_action('wp_ajax_bg_save', function () {
+    check_ajax_referer('bg_admin_save', 'nonce');
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('Unauthorized');
+    }
 
-    register_setting('bg_hero_options',    'bg_hero_slides',       ['sanitize_callback' => $arr_cb]);
-    register_setting('bg_slider_options',  'bg_slider_images',     ['sanitize_callback' => $arr_cb]);
-    register_setting('bg_about_options',   'bg_about_photos',      ['sanitize_callback' => $arr_cb]);
-    register_setting('bg_about_options',   'bg_profile_pic',       ['sanitize_callback' => 'absint']);
-    register_setting('bg_ticker_options',  'bg_ticker_text',       ['sanitize_callback' => 'sanitize_text_field']);
-    register_setting('bg_bubbles_options', 'bg_bubble_words',      ['sanitize_callback' => $bubble_cb]);
-    register_setting('bg_contact_options', 'bg_contact_phone',     ['sanitize_callback' => 'sanitize_text_field']);
-    register_setting('bg_contact_options', 'bg_contact_email',     ['sanitize_callback' => 'sanitize_email']);
-    register_setting('bg_contact_options', 'bg_contact_instagram', ['sanitize_callback' => 'sanitize_text_field']);
+    $tab = isset($_POST['tab']) ? sanitize_key($_POST['tab']) : '';
+
+    switch ($tab) {
+        case 'hero':
+            $ids = isset($_POST['bg_hero_slides']) ? (array) $_POST['bg_hero_slides'] : [];
+            update_option('bg_hero_slides', array_values(array_filter(array_map('absint', $ids))));
+            break;
+
+        case 'slider':
+            $ids = isset($_POST['bg_slider_images']) ? (array) $_POST['bg_slider_images'] : [];
+            update_option('bg_slider_images', array_values(array_filter(array_map('absint', $ids))));
+            break;
+
+        case 'about':
+            // Keep all 4 positions (including 0) so cell placement is preserved
+            $raw = isset($_POST['bg_about_photos']) ? (array) $_POST['bg_about_photos'] : [];
+            $cells = [];
+            for ($i = 0; $i < 4; $i++) $cells[] = absint($raw[$i] ?? 0);
+            update_option('bg_about_photos', $cells);
+            update_option('bg_profile_pic', absint($_POST['bg_profile_pic'] ?? 0));
+            break;
+
+        case 'ticker':
+            update_option('bg_ticker_text', sanitize_text_field(wp_unslash($_POST['bg_ticker_text'] ?? '')));
+            break;
+
+        case 'bubbles':
+            $raw   = wp_unslash($_POST['bg_bubble_words'] ?? '');
+            $lines = explode("\n", str_replace("\r", '', $raw));
+            update_option('bg_bubble_words', implode("\n", array_values(array_filter(array_map('sanitize_text_field', $lines)))));
+            break;
+
+        case 'contact':
+            update_option('bg_contact_phone',     sanitize_text_field(wp_unslash($_POST['bg_contact_phone']     ?? '')));
+            update_option('bg_contact_email',     sanitize_email(wp_unslash($_POST['bg_contact_email']          ?? '')));
+            update_option('bg_contact_instagram', sanitize_text_field(wp_unslash($_POST['bg_contact_instagram'] ?? '')));
+            break;
+
+        default:
+            wp_send_json_error('Unknown tab: ' . $tab);
+    }
+
+    wp_send_json_success('Saved');
 });
 
 /* ── Admin: menu page ───────────────────────────────────────────────────── */
@@ -151,6 +190,13 @@ add_action('admin_enqueue_scripts', function ($hook) {
     wp_enqueue_media();
     wp_enqueue_script('bg-admin', get_template_directory_uri() . '/admin/options.js', ['jquery'], null, true);
     wp_add_inline_style('wp-admin', bg_admin_css());
+    if ($on_settings) {
+        wp_localize_script('bg-admin', 'bgAdmin', [
+            'ajax'  => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('bg_admin_save'),
+            'tab'   => isset($_GET['tab']) ? sanitize_key($_GET['tab']) : 'hero',
+        ]);
+    }
 });
 
 function bg_admin_css() {
@@ -178,6 +224,7 @@ function bg_settings_page() {
     ?>
     <div class="wrap bg-admin">
         <h1>Brushgunz Media Manager</h1>
+        <div id="bg-save-notice" class="notice" style="display:none;margin-top:12px"></div>
         <nav class="nav-tab-wrapper" style="margin-bottom:0">
             <?php foreach ($tabs as $k => $label): ?>
                 <a href="<?php echo admin_url('admin.php?page=brushgunz&tab=' . $k); ?>"
@@ -187,20 +234,8 @@ function bg_settings_page() {
             <?php endforeach; ?>
         </nav>
 
-        <?php
-        // Map each tab to its own settings group
-        $tab_groups = [
-            'hero'    => 'bg_hero_options',
-            'slider'  => 'bg_slider_options',
-            'about'   => 'bg_about_options',
-            'ticker'  => 'bg_ticker_options',
-            'bubbles' => 'bg_bubbles_options',
-            'contact' => 'bg_contact_options',
-        ];
-        $current_group = $tab_groups[$tab] ?? 'bg_hero_options';
-        ?>
-        <form method="post" action="options.php" class="bg-form" style="padding-top:24px">
-            <?php settings_fields($current_group); ?>
+        <form class="bg-form" style="padding-top:24px">
+            <input type="hidden" name="tab" value="<?php echo esc_attr($tab); ?>">
 
             <?php if ($tab === 'hero'): ?>
                 <h2>Hero Slides</h2>
@@ -222,14 +257,14 @@ function bg_settings_page() {
                 <h2>About Photos</h2>
                 <p>The 2×2 photo grid on the about page. Upload one image per cell.</p>
                 <?php
-                $cells  = array_pad(bg_ids('bg_about_photos'), 4, 0);
+                $cells  = bg_about_cells();
                 $labels = ['Top Left', 'Top Right', 'Bottom Left', 'Bottom Right'];
                 ?>
                 <div class="bg-about-grid">
                     <?php for ($i = 0; $i < 4; $i++): ?>
                         <div class="bg-about-cell">
                             <strong><?php echo $labels[$i]; ?></strong>
-                            <?php bg_admin_row('bg_about_photos', $cells[$i]); ?>
+                            <?php bg_admin_row('bg_about_photos[' . $i . ']', $cells[$i]); ?>
                         </div>
                     <?php endfor; ?>
                 </div>
