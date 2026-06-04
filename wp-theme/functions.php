@@ -31,6 +31,11 @@ add_action('wp_enqueue_scripts', function () {
     }
 });
 
+/* ── Force classic editor for projects so meta boxes work reliably ────────── */
+add_filter('use_block_editor_for_post_type', function ($use, $type) {
+    return $type === 'bg_project' ? false : $use;
+}, 10, 2);
+
 /* ── Custom post type: Project ───────────────────────────────────────────── */
 add_action('init', function () {
     register_post_type('bg_project', [
